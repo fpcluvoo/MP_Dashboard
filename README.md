@@ -1,57 +1,47 @@
-# MP Dashboard
+# MP Dashboard · Amazon Analytics
 
-Deutschsprachige Dashboard-Basis für Online-Marketplace-Daten, gebaut mit JavaScript und Vite.
+Amazon-DE-Dashboard auf ASIN-Ebene mit einer lokalen Produktdatenbank als Grundlage für spätere Marketplace-Importe. Node.js 24, JavaScript, SQLite (Node `node:sqlite`), Vite und Playwright.
 
-## Aktueller Stand
+## Funktionsumfang
 
-- Umsatz, Bestellungen, durchschnittlicher Bestellwert und offene Bestellungen
-- Filter nach Marktplatz und Zeitraum sowie Umsatzvergleich und Bestellliste
-- Responsive Oberfläche mit **synthetischen Beispieldaten** für Amazon, eBay und Etsy (September 2026)
+- **Verkauf & Traffic:** Bestellumsatz, verkaufte Einheiten (Sales), Sessions, Conversion Rate und letzter Bewertungsstand inklusive Anzahl und Datum je ASIN.
+- **Erstattungen:** Betrag, erstattete Einheiten und Periodenquote je ASIN.
+- **Werbung:** Sponsored Products, Sponsored Brands, Sponsored Display, Streaming TV und sonstige Werbeformen. Eindeutig ASIN-zugeordnete Kosten sind getrennt von nicht zuordenbaren Kosten auf Kontoebene.
+- **Produktstamm:** interne Produkte → ASINs → Seller-SKUs. Mehrere SKUs einer ASIN verdoppeln keine Kennzahlen. Ein Produkt kann mehrere ASINs bündeln.
+- Zeitraum-, Produkt- und ASIN/SKU-Suchfilter, Listing-Details sowie mobile Darstellung.
 
-Es bestehen noch keine echten Marketplace-Verbindungen. Die Plattformnamen sind Beispiele und legen die späteren Integrationen nicht fest. Umsatz bedeutet hier Bestellwert, ohne Gebühren- und Retourenabzug. Es gibt noch kein Backend, Login oder dauerhafte Datenspeicherung. API-Schlüssel gehören niemals in Browsercode oder Git; echte Anbindungen benötigen eine abgesicherte serverseitige Integration.
+Alle Daten und IDs sind **synthetische Beispieldaten für September 2026**. Amazon-Importe, API-Verbindungen, Authentifizierung und Datenpflege im Browser sind noch nicht implementiert. Es gibt keine Auswertung anderer gekaufter SKUs und keine künstlich abgeleiteten organischen Sales.
 
 ## Entwicklung
 
-Node.js 24 (siehe `.nvmrc`) und npm verwenden.
-
 ```sh
 npm ci
+npm run db:init
 npm run dev
 ```
+
+`db:init` legt die leere lokale Datenbank `.data/catalog.sqlite` mit dem relationalen Schema an. Der Befehl ist wiederholbar und überschreibt keine Daten. Dieses lokale Datenbankfundament ist noch kein gehosteter Backend-Dienst.
+
+`predev` und `prebuild` führen automatisch `npm run data:prepare` aus. Dieser Befehl legt separat `.data/demo.sqlite` an, ergänzt fehlende Beispieldatensätze idempotent und exportiert ausschließlich diese Demo in die ignorierte Datei `src/data/demo.generated.json`. Vite bindet den Snapshot in die öffentliche Website ein. Die Katalogdatenbank wird **nie** durch diesen Build exportiert. Beide SQLite-Dateien bleiben außerhalb von Git.
 
 ```sh
 npm run build
 npm run preview
-```
-
-## Browsertests
-
-Einmalig den Playwright-Browser installieren, dann die Tests starten:
-
-```sh
+npm run test:unit
 npx playwright install chromium
 npm test
 ```
 
-Alternativ einen vorhandenen Chromium verwenden:
+In der Cloud mit vorhandenem Browser: `CHROMIUM_PATH=/usr/bin/chromium npm test`. npm-Installationen hier mit `--cache /workspace/.npm-cache` ausführen. Der Browsertest startet seinen Server auf Port 4173 selbst. `npm test` prüft zuerst das Datenmodell und anschließend die Oberfläche.
 
-```sh
-CHROMIUM_PATH=/usr/bin/chromium npm test
-```
+## Datenmodell und Definitionen
 
-Die Tests prüfen Kennzahlen, kombinierte Filter, Zurücksetzen, JavaScript-Fehler und das mobile Layout. Der Testserver startet automatisch auf Port 4173; dieser Port muss frei sein.
+Siehe [database/README.md](database/README.md) und [database/schema.sql](database/schema.sql). Die Kennzahlendefinitionen sind ebenfalls direkt im Dashboard abrufbar. Fehlende Werte sind keine Nullwerte; Bewertungen werden nicht über ASINs gemittelt. Kosten ohne eindeutigen ASIN-Bezug werden niemals auf Produkte verteilt.
 
-## Cloud-Umgebung
+## Veröffentlichung
 
-Das Checkout liegt unter `/workspace/MP_Dashboard`. In dieser Umgebung npm mit `--cache /workspace/.npm-cache` ausführen, da der Standardcache im Home-Verzeichnis nicht beschreibbar ist. Es werden keine Secrets oder externen Dienste für die Demo benötigt. Nach einer neuen Sitzung `npm run dev -- --port 5173 --strictPort` starten. Laufende Prozesse werden nicht als Bestandteil des Umgebungssnapshots vorausgesetzt.
+Öffentliche Demo: https://fpcluvoo.github.io/MP_Dashboard/
 
-## Öffentliche Demo auf GitHub Pages
+`.github/workflows/pages.yml` testet und baut bei jedem Push auf `main` und veröffentlicht den synthetischen Snapshot über GitHub Pages. In **Settings → Pages → Source** muss **GitHub Actions** ausgewählt sein. GitHub Pages hostet nur die statische Demo, keine SQLite-Datenbank oder Server-API.
 
-Der Workflow `.github/workflows/pages.yml` testet und baut die Anwendung bei jedem Push auf `main` und veröffentlicht `dist` auf GitHub Pages. Die Website zeigt ausschließlich die oben beschriebenen Beispieldaten.
-
-Einmalig unter **Settings → Pages → Build and deployment → Source** die Option **GitHub Actions** auswählen. Falls der erste Workflow vor der Aktivierung fehlgeschlagen ist, unter **Actions → Deploy dashboard to GitHub Pages → Run workflow** erneut starten. Bei privaten Repositories hängt die Verfügbarkeit von GitHub Pages vom GitHub-Tarif ab; das Repository muss für diese Einrichtung nicht öffentlich gestellt werden.
-
-Nach einem erfolgreichen Deploy ist die erwartete Adresse:
-https://fpcluvoo.github.io/MP_Dashboard/
-
-Der relative Vite-Basispfad stellt sicher, dass JavaScript und CSS auch unter dem Repository-Unterpfad geladen werden.
+Echte Seller-Daten dürfen nicht in diesen öffentlichen Demo-Build gelangen. Die spätere Amazon-Anbindung braucht einen privaten Backend-Dienst mit Zugriffskontrolle, sicheren API-Zugangsdaten und freigegebenen Datenquellen. Dafür stehen Tabellen für Konten/Regionen, Produkt-/SKU-Zuordnungen, Tageskennzahlen, Bewertungsstände und Werbeausgaben bereit. Bestehende Konto- und Produktzuordnungen dürfen beim Import nicht aus Produktnamen erraten werden.
