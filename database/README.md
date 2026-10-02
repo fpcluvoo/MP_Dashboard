@@ -32,3 +32,5 @@ Kein automatischer Import oder Zugang ist bereits eingerichtet. Keine organische
 ## Betrieb
 
 `npm run db:init`: leere lokale `.data/catalog.sqlite` ohne Export. `npm run data:prepare`: separate synthetische Demo-Datenbank und öffentlicher Demo-Snapshot. Ein wiederholter Demolauf fügt nur fehlende Seed-Zeilen hinzu; Änderungen an bereits vorhandenen Beispieldaten benötigen einen bewussten Neuaufbau ausschließlich der Demo-Datenbank. Produktivdaten gehören in einen privaten Backend-Dienst mit Migrationen, Backups und Zugangskontrolle; die aktuelle Pages-Website besitzt keine Server-Datenbank.
+
+Der aktuelle Demo-Seed wird aus `catalog/assortment.json` abgeleitet. Nur bestätigte Farbvarianten erhalten klar synthetische Listings; alle benannten Modelle sind zusätzlich im Produktstamm sichtbar. Die Exportdatei enthält die Sortimentsmetadaten getrennt von simulierten Verkaufsdaten. Echte Katalogzuordnungen bleiben leer. Die frühere `demo.sqlite` bleibt erhalten und wird nicht in diesen Snapshot aufgenommen.

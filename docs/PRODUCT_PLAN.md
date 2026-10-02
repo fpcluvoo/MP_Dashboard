@@ -12,7 +12,7 @@ Sellerboard ist eine funktionale Referenz für Profitabilitäts- und Marketplace
 
 ## 2. Was bereits existiert — und was noch fehlt
 
-Vorhanden: statische Amazon-DE-Demo, vier synthetische ASINs, Produkt-/SKU-Modell, lokale SQLite-Grundlage, Verkauf/Traffic/Erstattungen/Werbekosten, einzelne Produktfilter und Listing-Details, automatisierte Tests und GitHub-Pages-Veröffentlichung.
+Vorhanden: statische Amazon-DE-Demo, 18 synthetische Listings auf bestätigten Clouvou-Stuhlvarianten, 15 benannte Modelle im Produktstamm und Marken-/Kategoriefilter, Produkt-/SKU-Modell, lokale SQLite-Grundlage, Verkauf/Traffic/Erstattungen/Werbekosten, einzelne Produktfilter und Listing-Details, automatisierte Tests und GitHub-Pages-Veröffentlichung.
 
 Noch nicht vorhanden: echtes Reporting über mehrere Marktplätze, größere Historie, frei wählbare Vergleichszeiträume, Trends, Kostenrechnung, editierbarer Produktstamm, gespeicherte Reports, Importpipeline, Backend-API, Login und echte Marketplace-Verbindungen.
 
@@ -105,7 +105,7 @@ erDiagram
   MARKETPLACE_ACCOUNT ||--o{ AD_FACT : spends
 ```
 
-- **Produktfamilie:** gemeinsame kaufmännische Sicht, beispielsweise „Studio Kopfhörer“.
+- **Produktfamilie:** gemeinsame kaufmännische Sicht, beispielsweise „Bright Seat“.
 - **Verkaufbare Variante:** dauerhaft eindeutige interne SKU, z. B. Schwarz. Einzelne Varianten besitzen eigene Kosten und externe Zuordnungen. Die interne SKU ist kein Amazon-Schlüssel.
 - **Listing:** externe Verkaufsidentität im jeweiligen Marketplace-/Konto-/Länderkontext; bei Amazon grundsätzlich Child-ASIN. Parent-ASIN als Beziehung, nicht als zusätzliche summierbare Verkaufszeile.
 - **Seller-SKU-Zuordnung:** externe Seller-SKU mit Gültigkeitszeitraum und Fulfillment-Kontext. Mehrere SKUs einer ASIN vervielfachen keine ASIN-Metriken.
@@ -114,7 +114,7 @@ erDiagram
 - **Bundles:** später eigene verkaufbare SKU mit versionierter Komponentenliste. Komponenten dienen zunächst Kosten-/Bestandslogik; Verkaufsumsatz wird ohne explizite Methode nicht mehrfach auf Komponenten verteilt.
 - **Mandant/Workspace:** von Anfang an Teil aller fachlichen Schlüssel und Abfragegrenzen, auch wenn zunächst nur die eigene Firma arbeitet.
 
-Beispiel: Produktfamilie Kopfhörer → Variante Schwarz → Amazon DE Child-ASIN mit FBA- und FBM-SKU sowie später ein Listing desselben Artikels auf einem anderen Marktplatz. Einheiten über Kanäle lassen sich addieren; Sessions und Conversion werden nur im definierten vergleichbaren Kontext aggregiert.
+Beispiel: Produktfamilie Bright Seat → Variante Schwarz → Amazon DE Child-ASIN mit FBA- und FBM-SKU sowie später ein Listing desselben Artikels auf einem anderen Marktplatz. Einheiten über Kanäle lassen sich addieren; Sessions und Conversion werden nur im definierten vergleichbaren Kontext aggregiert.
 
 ## 6. Fakten statt einer universellen KPI-Tabelle
 

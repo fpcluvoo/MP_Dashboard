@@ -6,27 +6,27 @@ test('Amazon overview, product and SKU filters, details and empty state', async 
   await page.goto('/');
   await expect(page.getByRole('heading', { name: 'Deine Listings im Überblick.' })).toBeVisible();
   await expect(page.getByText('Demo-Modus')).toBeVisible();
-  await expect(page.getByTestId('units')).toHaveText('1.590');
-  await expect(page.getByTestId('listing-row')).toHaveCount(4);
-  await page.getByLabel('Internes Produkt', { exact: true }).selectOption('p-audio');
-  await expect(page.getByTestId('listing-row')).toHaveCount(2);
-  await expect(page.getByTestId('units')).toHaveText('720');
-  await page.getByLabel('Listing suchen').fill('AUDIO-BLK-FBM');
+  await expect(page.getByTestId('units')).toHaveText('4.230');
+  await expect(page.getByTestId('listing-row')).toHaveCount(18);
+  await page.getByLabel('Modell', { exact: true }).selectOption('clouvou-bright-seat');
+  await expect(page.getByTestId('listing-row')).toHaveCount(3);
+  await expect(page.getByTestId('units')).toHaveText('630');
+  await page.getByLabel('Listing suchen').fill('DEMO-SKU-001-FBM');
   await expect(page.getByTestId('listing-row')).toHaveCount(1);
-  await expect(page.getByTestId('units')).toHaveText('420');
+  await expect(page.getByTestId('units')).toHaveText('180');
   await page.getByLabel('Zeitraum').selectOption('7');
-  await expect(page.getByTestId('units')).toHaveText('98');
-  await page.getByRole('button', { name: 'Studio Kopfhörer · Schwarz', exact: true }).click();
+  await expect(page.getByTestId('units')).toHaveText('42');
+  await page.getByRole('button', { name: 'Clouvou Bright Seat · Schwarz', exact: true }).click();
   await expect(page.getByRole('dialog')).toBeVisible();
-  await expect(page.getByRole('dialog')).toContainText('AUDIO-BLK-FBM');
+  await expect(page.getByRole('dialog')).toContainText('DEMO-SKU-001-FBM');
   await expect(page.getByRole('dialog')).toContainText('Sponsored Products');
   await page.keyboard.press('Escape');
   await expect(page.getByRole('dialog')).not.toBeVisible();
   await page.getByLabel('Listing suchen').fill('does-not-exist');
-  await expect(page.getByText('Keine Listings gefunden')).toBeVisible();
+  await expect(page.getByText('Keine Demo-Listings in dieser Auswahl')).toBeVisible();
   await expect(page.getByTestId('units')).toHaveText('—');
   await page.getByRole('button', { name: 'Zurücksetzen', exact: true }).click();
-  await expect(page.getByTestId('units')).toHaveText('1.590');
+  await expect(page.getByTestId('units')).toHaveText('4.230');
   expect(errors).toEqual([]);
 });
 
@@ -36,7 +36,7 @@ test('ad overhead stays separate from filtered listing spend; refunds and produc
   await expect(page.getByTestId('unassigned-spend')).toHaveText(/615,00\s*€/);
   const account = await page.getByTestId('account-spend').innerText();
   const assigned = await page.getByTestId('assigned-spend').innerText();
-  await page.getByLabel('Internes Produkt', { exact: true }).selectOption('p-audio');
+  await page.getByLabel('Modell', { exact: true }).selectOption('clouvou-bright-seat');
   await expect(page.getByTestId('unassigned-spend')).toHaveText(/615,00\s*€/);
   await expect(page.getByTestId('account-spend')).toHaveText(account);
   await expect(page.getByTestId('assigned-spend')).not.toHaveText(assigned);
@@ -46,16 +46,41 @@ test('ad overhead stays separate from filtered listing spend; refunds and produc
   await expect(page.getByRole('heading', { name: 'Erstattungen nach ASIN' })).toBeVisible();
   await expect(page.getByTestId('refund-amount')).not.toHaveText('—');
   await page.getByRole('button', { name: 'Produktstamm', exact: true }).click();
-  await expect(page.getByRole('region', { name: 'Produktstamm', exact: true })).toContainText('AUDIO-BLK-FBA');
-  await expect(page.getByRole('region', { name: 'Produktstamm', exact: true })).toContainText('AUDIO-BLK-FBM');
+  await expect(page.getByRole('region', { name: 'Produktstamm', exact: true })).toContainText('Bright Seat');
+  await expect(page.getByRole('region', { name: 'Produktstamm', exact: true })).toContainText('Echte SKU / ASIN noch offen');
 });
 
 test('all mobile sections fit the viewport and missing ratings are explicit', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');
-  await expect(page.getByText('Nicht verfügbar', { exact: true })).toBeVisible();
+  await expect(page.getByText('Nicht verfügbar', { exact: true }).first()).toBeVisible();
   for (const name of ['Verkauf & Traffic', 'Erstattungen', 'Werbung', 'Produktstamm']) {
     await page.getByRole('button', { name, exact: true }).click();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   }
+});
+
+test('catalog shows all brands and pending details without fake variants', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.getByRole('region', { name: 'Markenübersicht' })).toContainText('Wintoncove');
+  await page.getByRole('button', { name: 'Produktstamm', exact: true }).click();
+  await expect(page.getByTestId('catalog-row')).toHaveCount(15);
+  await page.getByLabel('Marke', { exact: true }).selectOption('lutivo');
+  await expect(page.getByTestId('catalog-row')).toHaveCount(6);
+  await expect(page.getByTestId('units')).toHaveText('—');
+  await page.getByLabel('Kategorie', { exact: true }).selectOption('desks');
+  await expect(page.getByTestId('catalog-row')).toHaveCount(2);
+  await expect(page.getByRole('region', {name:'Produktstamm',exact:true})).toContainText('Foxtrot');
+  await page.getByRole('button', {name:'Verkauf & Traffic',exact:true}).click();
+  await expect(page.getByText('Keine Demo-Listings in dieser Auswahl')).toBeVisible();
+  await page.getByRole('button', {name:'Produktstamm ansehen'}).click();
+  await expect(page.getByRole('heading', {name:'Euer Produktstamm'})).toBeVisible();
+  await page.getByLabel('Kategorie', { exact: true }).selectOption('all');
+  await page.getByLabel('Marke', { exact: true }).selectOption('wintoncove');
+  await expect(page.getByText('5 Modelle · Namen und Varianten folgen.', {exact:true})).toBeVisible();
+  await expect(page.getByTestId('catalog-row')).toHaveCount(0);
+  await page.getByRole('button', {name:'Zurücksetzen',exact:true}).click();
+  await page.getByLabel('Modell', {exact:true}).selectOption('clouvou-bright-seat');
+  await page.getByLabel('Marke', {exact:true}).selectOption('lutivo');
+  await expect(page.getByLabel('Modell', {exact:true})).toHaveValue('all');
 });

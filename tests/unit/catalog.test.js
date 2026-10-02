@@ -1,0 +1,20 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { demoData, assortment } from '../../database/demo.js';
+import { selectCatalog } from '../../src/catalog.js';
+const data = () => ({ ...demoData(), catalog: assortment });
+test('demo covers only confirmed color variants and keeps actual mappings empty', () => {
+  const d = data();
+  assert.deepEqual(d.catalog.brands.map(b => b.name), ['Clouvou','Lutivo','Wintoncove']);
+  assert.equal(d.products.length, 15);
+  assert.equal(d.listings.length, 18);
+  assert.equal(d.catalog.marketplace_mappings.length, 0);
+  assert.ok(d.catalog.variants.every(v => v.internal_sku === null && v.gtin === null));
+  assert.ok(d.listings.every(l => l.external_id.startsWith('DEMO-') && d.catalog.variants.some(v => `demo-${v.id}` === l.id)));
+  assert.equal(selectCatalog(d, {brandId:'lutivo'}).models.length, 6);
+  assert.equal(selectCatalog(d, {brandId:'lutivo', categoryId:'desks'}).models.length, 2);
+  const pending = selectCatalog(d, {brandId:'wintoncove'});
+  assert.equal(pending.models.length, 0);
+  assert.equal(pending.groups[0].confirmed_model_count, 5);
+  assert.equal(selectCatalog(d, {query:'DEMO-SKU-001-FBM'}).models[0].name, 'Bright Seat');
+});

@@ -57,6 +57,6 @@ Die Reihenfolge blockiert die Definition der bereits bekannten Modelle nicht. Nu
 
 ## Verwendung und Abgrenzung
 
-Der Katalog ist zunächst eine versionierte Definitionsdatei für den nächsten Fundament-Arbeitsblock. Er wird noch nicht automatisch in die alte Prototyp-Datenbank importiert und verändert die veröffentlichte Demo nicht. Der Prototyp besitzt noch keine fertigen Marken-/Varianten-/Mapping-Historien. Diese Struktur wird im geplanten Fundament ergänzt.
+Der Katalog steuert jetzt den Produktstamm und die Marken-/Kategorie-/Modellfilter der Live-Demo. Alle 15 benannten Modelle sowie die noch offenen Sortimentsgruppen sind sichtbar. Die 18 bestätigten Clouvou-Bürostuhl-Farbvarianten erhalten simulierte Kennzahlen und ausdrücklich mit `DEMO-` gekennzeichnete externe IDs. Echte Marketplace-Zuordnungen bleiben in der Definitionsdatei leer.
 
-Die bisherige Demo mit Kopfhörern, Lampe und Becher beschreibt **nicht euer Sortiment**. Beim nächsten fachlichen Demo-Aufbau werden bestätigte Modelle und Varianten verwendet; alle dazu generierten Kennzahlen und externen Identifikatoren müssen weiterhin eindeutig als synthetisch gekennzeichnet sein. Fehlende echte Varianteninformationen werden nicht durch plausible Verkaufsbehauptungen ersetzt.
+Die früheren Demoartikel (Kopfhörer, Lampe, Becher) wurden aus dem aktuellen Snapshot entfernt. Für Lutivo, Wintoncove und Tischmodelle ohne bestätigte Varianten werden keine Varianten oder Kennzahlen erfunden. Die lokale echte Katalogdatenbank wird nicht überschrieben oder veröffentlicht; vollständige Mapping-Historien und produktive Imports bleiben Bestandteil des geplanten Fundament-Ausbaus.

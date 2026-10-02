@@ -12,7 +12,7 @@ Amazon-DE-Dashboard auf ASIN-Ebene mit einer lokalen Produktdatenbank als Grundl
 - **Produktstamm:** interne Produkte → ASINs → Seller-SKUs. Mehrere SKUs einer ASIN verdoppeln keine Kennzahlen. Ein Produkt kann mehrere ASINs bündeln.
 - Zeitraum-, Produkt- und ASIN/SKU-Suchfilter, Listing-Details sowie mobile Darstellung.
 
-Alle Daten und IDs sind **synthetische Beispieldaten für September 2026**. Amazon-Importe, API-Verbindungen, Authentifizierung und Datenpflege im Browser sind noch nicht implementiert. Es gibt keine Auswertung anderer gekaufter SKUs und keine künstlich abgeleiteten organischen Sales.
+Marken und Modellnamen stammen aus dem bestätigten Sortiment **Clouvou, Lutivo und Wintoncove**. Der Produktstamm zeigt 15 benannte Modelle und offene Sortimentsgruppen. Für die 18 bestätigten Clouvou-Bürostuhl-Farbvarianten werden **synthetische Kennzahlen für September 2026** erzeugt; sämtliche Demo-Listing-/SKU-IDs sind ausdrücklich mit `DEMO-` gekennzeichnet. Echte ASINs/SKUs und unbekannte Varianten bleiben offen. Amazon-Importe, API-Verbindungen, Authentifizierung und Datenpflege im Browser sind noch nicht implementiert. Es gibt keine Auswertung anderer gekaufter SKUs und keine künstlich abgeleiteten organischen Sales.
 
 ## Entwicklung
 
@@ -24,7 +24,7 @@ npm run dev
 
 `db:init` legt die leere lokale Datenbank `.data/catalog.sqlite` mit dem relationalen Schema an. Der Befehl ist wiederholbar und überschreibt keine Daten. Dieses lokale Datenbankfundament ist noch kein gehosteter Backend-Dienst.
 
-`predev` und `prebuild` führen automatisch `npm run data:prepare` aus. Dieser Befehl legt separat `.data/demo.sqlite` an, ergänzt fehlende Beispieldatensätze idempotent und exportiert ausschließlich diese Demo in die ignorierte Datei `src/data/demo.generated.json`. Vite bindet den Snapshot in die öffentliche Website ein. Die Katalogdatenbank wird **nie** durch diesen Build exportiert. Beide SQLite-Dateien bleiben außerhalb von Git.
+`predev` und `prebuild` führen automatisch `npm run data:prepare` aus. Dieser Befehl legt separat `.data/demo-assortment-v1.sqlite` an, ergänzt fehlende Beispieldatensätze idempotent und exportiert ausschließlich diese Demo in die ignorierte Datei `src/data/demo.generated.json`. Die öffentliche Website lädt den versionierten JSON-Snapshot als statische Datei. Der Seed liest Modelle und Varianten aus `catalog/assortment.json`; Marken-/Kategorie-/Modellfilter sind direkt nutzbar. Die vorherige `.data/demo.sqlite` wird nicht gelöscht oder weiter exportiert. Die Katalogdatenbank wird **nie** durch diesen Build exportiert. Beide SQLite-Dateien bleiben außerhalb von Git.
 
 ```sh
 npm run build

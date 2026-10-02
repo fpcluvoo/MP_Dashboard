@@ -1,6 +1,16 @@
 import './style.css';
-import data from './data/demo.generated.json';
+import dataUrl from './data/demo.generated.json?url';
+let data;
+try {
+  const response = await fetch(dataUrl);
+  if (!response.ok) throw new Error(`Demo data: HTTP ${response.status}`);
+  data = await response.json();
+} catch (error) {
+  document.querySelector('#app').innerHTML = '<main class="load-error"><h1>Demodaten konnten nicht geladen werden</h1><p>Bitte lade die Seite erneut.</p></main>';
+  throw error;
+}
 import { analytics, adTypes } from './analytics.js';
+import { selectCatalog } from './catalog.js';
 
 const money = v => v == null ? '—' : new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(v / 100);
 const number = v => v == null ? '—' : new Intl.NumberFormat('de-DE').format(v);
@@ -13,17 +23,24 @@ const sumAds = rows => rows.reduce((n, r) => n + r.spend_cents, 0);
 const rating = row => row.rating?.rating == null ? '<span class="muted">Nicht verfügbar</span>' : `<span class="stars">★</span> ${number(row.rating.rating)} <small>(${number(row.rating.rating_count)})</small><small class="subline">Stand ${escape(row.rating.date)}</small>`;
 
 document.querySelector('#app').innerHTML = `
-  <aside><a class="brand" href="./"><span class="logo">mp</span> Marketplace</a><p class="nav-label">VERKAUFSKANAL</p><a class="active" href="#overview" aria-current="page"><span class="amazon-icon">a</span> Amazon <span class="country">DE</span></a><div class="aside-note">Deine Produkte.<br>Alle Kennzahlen.<small>Amazon Workspace</small></div></aside>
+  <aside><a class="brand" href="./"><span class="logo">mp</span> Marketplace</a><p class="nav-label">VERKAUFSKANAL</p><a class="active" href="#overview" aria-current="page"><span class="amazon-icon">a</span> Amazon <span class="country">DE</span></a><div class="aside-note">Drei Marken.<br>Ein Überblick.<small>Clouvou · Lutivo · Wintoncove</small></div></aside>
   <main id="overview">
     <header><span>WORKSPACE / AMAZON DE</span><span class="demo">● Demo-Modus</span></header>
-    <section class="heading"><div><p class="eyebrow">AMAZON · DEUTSCHLAND</p><h1>Deine Listings im Überblick.</h1><p>Von der ASIN zum Produkt. Verkauf, Traffic und Werbung an einem Ort.</p></div></section>
-    <div class="notice"><strong>Beispieldaten · September 2026.</strong> Keine Amazon-Anbindung aktiv. ASINs, SKUs, Bewertungen und Kennzahlen sind erfunden. Alle Beträge in EUR.</div>
+    <section class="heading"><div><p class="eyebrow">AMAZON · DEUTSCHLAND</p><h1>Deine Listings im Überblick.</h1><p>Clouvou, Lutivo & Wintoncove. Euer Sortiment als Grundlage für Amazon-Reporting.</p></div></section>
+    <div class="notice"><strong>Beispieldaten · September 2026.</strong> Marken und Modelle stammen aus eurem Katalog. Kennzahlen, Bewertungen und alle mit DEMO gekennzeichneten IDs sind erfunden. Keine Amazon-Anbindung; echte ASINs und SKUs bleiben offen. Alle Beträge in EUR.</div>
+    <section class="brand-overview" aria-label="Markenübersicht">${data.catalog.brands.map(b => {
+      const count = data.catalog.models.filter(m => m.brand_id === b.id).length;
+      return `<article><span class="brand-wordmark">${escape(b.name)}</span><small>${count ? `${count} benannte Modelle` : '5 Bürostuhlmodelle · Namen folgen'}</small></article>`;
+    }).join('')}</section>
     <section class="filters" aria-label="Filter">
       <label>Zeitraum<select id="period" aria-label="Zeitraum"><option value="30">01.–30. September 2026</option><option value="7">24.–30. September 2026</option></select></label>
-      <label>Internes Produkt<select id="product" aria-label="Internes Produkt"><option value="all">Alle Produkte</option>${data.products.map(p => `<option value="${escape(p.id)}">${escape(p.name)}</option>`).join('')}</select></label>
+      <label>Marke<select id="brand" aria-label="Marke"><option value="all">Alle Marken</option>${data.catalog.brands.map(b => `<option value="${escape(b.id)}">${escape(b.name)}</option>`).join('')}</select></label>
+      <label>Kategorie<select id="category" aria-label="Kategorie"><option value="all">Alle Kategorien</option>${data.catalog.categories.map(c => `<option value="${escape(c.id)}">${escape(c.name)}</option>`).join('')}</select></label>
+      <label>Modell<select id="product" aria-label="Modell"></select></label>
       <label class="search-label">Listing suchen<input id="search" type="search" placeholder="ASIN, SKU oder Produktname" aria-label="Listing suchen"></label>
       <button id="reset">Zurücksetzen</button>
     </section>
+    <p id="coverage" class="coverage" aria-live="polite"></p>
     <div id="summary" aria-live="polite"></div>
     <nav class="tabs" aria-label="Auswertungsbereich">${Object.entries(tabs).map(([id, label]) => `<button data-view="${id}" aria-pressed="${id === view}">${label}</button>`).join('')}</nav>
     <div id="content"></div>
@@ -49,7 +66,12 @@ function render() {
   const start = document.querySelector('#period').value === '7' ? '2026-09-24' : data.start;
   const productId = document.querySelector('#product').value;
   const query = document.querySelector('#search').value;
-  const report = analytics(data, { start, end: data.end, productId, query });
+  const brandId = document.querySelector('#brand').value;
+  const categoryId = document.querySelector('#category').value;
+  const selection = { brandId, categoryId, productId, query };
+  const catalog = selectCatalog(data, selection);
+  const report = analytics(data, { start, end: data.end, ...selection });
+  document.querySelector('#coverage').textContent = `${catalog.models.length} benannte Modelle in Auswahl · ${report.rows.length} Demo-Listings auf Basis bestätigter Farbvarianten. Weitere Modelle und offene Angaben findest du im Produktstamm.`;
   const m = report.metrics;
   document.querySelector('#summary').innerHTML = `<section class="metrics" aria-label="Verkauf und Traffic">
     ${metric('Umsatz', money(m.revenue_cents), 'Vor Erstattungen & Gebühren', 'revenue', true)}
@@ -70,15 +92,19 @@ function render() {
       <section class="panel">${head('Werbekosten nach ASIN', 'Nur Kosten mit eindeutigem Listing-Bezug')}${table(['Listing / ASIN', 'Sponsored Products', 'Sponsored Brands', 'Sponsored Display', 'Streaming TV', 'Sonstige', 'Gesamt'], report.rows.map(r => `<tr><td>${listingCell(r)}</td>${Object.keys(adTypes).map(type => `<td>${r.ads.some(a => a.ad_type === type) ? money(sumAds(r.ads.filter(a => a.ad_type === type))) : '—'}</td>`).join('')}<td>${money(sumAds(r.ads))}</td></tr>`), 'Werbekosten nach ASIN')}</section>
       <div class="notice"><strong>Nicht zuordenbar bleibt separat.</strong> In diesen Beispieldaten fehlt für einen Teil der Kampagnen der eindeutige ASIN-Bezug. Diese Kosten bleiben auch bei Produktauswahl sichtbar und werden keinem Produkt zugeschlagen.</div>`;
   } else {
-    const selectedProducts = data.products.filter(p => report.rows.some(r => r.product_id === p.id));
-    html = `<section class="panel">${head('Produktstamm & SKU-Zuordnung', 'Internes Produkt → Amazon-ASIN → Seller-SKU')}<p class="table-note">Ein Produkt bündelt mehrere ASINs. Mehrere Seller-SKUs derselben ASIN verdoppeln die Kennzahlen nicht. Die Zuordnungen sind vorbereitet; ein automatischer Amazon-Import ist noch nicht aktiv.</p>${table(['Internes Produkt', 'Interne SKU', 'Amazon-ASIN', 'Seller-SKUs', 'Umsatz · Auswahl'], selectedProducts.map(p => {
-      const rows = report.rows.filter(r => r.product_id === p.id);
-      const revenue = rows.every(r => r.metrics.revenue_cents != null) ? rows.reduce((n,r) => n + r.metrics.revenue_cents, 0) : null;
-      return `<tr><td><strong>${escape(p.name)}</strong><small class="subline">${rows.length} ASINs in Auswahl</small></td><td class="mono">${escape(p.internal_sku)}</td><td>${rows.map(r => `<span class="subline mono">${escape(r.external_id)}</span>`).join('')}</td><td>${rows.flatMap(r => r.skus).map(s => `<span class="subline mono">${escape(s.sku)} <span class="status">${escape(s.fulfillment)}</span></span>`).join('')}</td><td>${money(revenue)}</td></tr>`;
+    html = `<section class="panel">${head('Euer Produktstamm', 'Bestätigte Modelle · keine echten Marketplace-Zuordnungen')}<p class="table-note">Alle 15 benannten Modelle sind erfasst. Kennzahlen werden vorerst nur für die 18 bestätigten Clouvou-Bürostuhlvarianten simuliert. Fehlende Varianten bleiben offen; interne SKUs und Amazon-Zuordnungen wurden noch nicht geliefert.</p>${table(['Marke', 'Modell', 'Kategorie', 'Bestätigte Varianten / Angaben', 'Datenstand'], catalog.models.map(p => {
+      const brand = data.catalog.brands.find(b => b.id === p.brand_id);
+      const category = data.catalog.categories.find(c => c.id === p.category_id);
+      const variants = data.catalog.variants.filter(v => v.model_id === p.id);
+      const info = variants.length ? variants.map(v => v.color).join(' · ') : p.category_id === 'desks' ? `${p.size_option_count === 2 ? '2 Größen' : 'Mehrere Größen'} · Maße und Farbkombinationen folgen` : 'Farben und Varianten folgen';
+      return `<tr data-testid="catalog-row"><td>${escape(brand.name)}</td><td><strong>${escape(p.name)}</strong></td><td>${escape(category.name)}</td><td class="catalog-description">${escape(info)}</td><td><span class="status ${variants.length ? '' : 'pending'}">${variants.length ? `${variants.length} Farbvarianten bestätigt` : 'Varianten offen'}</span><span class="subline">Echte SKU / ASIN noch offen</span></td></tr>`;
     }), 'Produktstamm')}</section>`;
+    if (catalog.groups.length) html += `<section class="panel">${head('Noch zu ergänzen', 'Keine erfundenen Artikel oder Varianten')}<div class="pending-grid">${catalog.groups.map(g => `<article><p class="eyebrow">${escape(data.catalog.brands.find(b => b.id === g.brand_id).name)}</p><h3>${escape(data.catalog.categories.find(c => c.id === g.category_id).name)}</h3><p>${g.confirmed_model_count ? `${g.confirmed_model_count} Modelle · Namen und Varianten folgen.` : g.category_id === 'gaming-chairs' ? 'Geplante Erweiterung · Modelle und Varianten folgen.' : 'Konkrete Artikel folgen. Beispiele: Mauspad, Stehmatte, Sitzkissen, Fußstütze.'}</p></article>`).join('')}</div></section>`;
   }
-  if (!report.rows.length) html = `<div class="empty" role="status"><h2>Keine Listings gefunden</h2><p>Suche oder Produktauswahl anpassen. Fehlende Werte werden nicht als Null ausgewiesen.</p></div>` + (view === 'ads' ? html : '');
+  if (!report.rows.length && view !== 'catalog') html = `<div class="empty" role="status"><h2>Keine Demo-Listings in dieser Auswahl</h2><p>${catalog.models.length || catalog.groups.length ? 'Das Sortiment ist vorgemerkt. Varianten und echte Marketplace-Zuordnungen sind noch offen; deshalb werden hier keine Kennzahlen erfunden.' : 'Suche oder Filter anpassen. Fehlende Daten sind keine Nullverkäufe.'}</p><button id="open-catalog">Produktstamm ansehen</button></div>` + (view === 'ads' ? html : '');
+  if (view === 'catalog' && !catalog.models.length && !catalog.groups.length) html = '<div class="empty" role="status"><h2>Keine Modelle gefunden</h2><p>Suche oder Filter anpassen.</p></div>';
   document.querySelector('#content').innerHTML = html;
+  document.querySelector('#open-catalog')?.addEventListener('click', () => { view = 'catalog'; render(); });
   document.querySelectorAll('[data-listing]').forEach(b => b.addEventListener('click', () => {
     showDetail(report.rows.find(r => r.id === b.dataset.listing));
   }));
@@ -87,7 +113,7 @@ function showDetail(row) {
   const m = row.metrics;
   const dialog = document.querySelector('#listing-dialog');
   document.querySelector('#detail-content').innerHTML = `<div class="panel-heading"><div><p class="eyebrow">AMAZON DE · ${escape(row.external_id)}</p><h2 id="detail-title">${escape(row.title)}</h2></div><button id="close-detail" aria-label="Details schließen">Schließen ×</button></div>
-    <p class="table-note">${escape(row.product.name)} · ${escape(row.product.internal_sku)}<br>${row.skus.map(s => escape(s.sku)).join(' · ')}</p>
+    <p class="table-note">Synthetisches Demo-Listing · echte SKU/ASIN-Zuordnung noch offen.<br>${escape(row.product.name)} · ${escape(row.product.internal_sku)}<br>${row.skus.map(s => escape(s.sku)).join(' · ')}</p>
     <h3>Verkauf & Traffic</h3><section class="metrics">${metric('Umsatz', money(m.revenue_cents), 'Bestellumsatz')}${metric('Sales', number(m.units), 'Verkaufte Einheiten')}${metric('Sessions', number(m.sessions), 'ASIN-Sessions')}${metric('Conversion Rate', percent(m.conversion), 'Einheiten ÷ Sessions')}</section>
     <h3>Bewertungen & Erstattungen</h3><p>Bewertung: ${rating(row)}</p><section class="metrics secondary">${metric('Erstattungsbetrag', money(m.refund_cents), 'Nach Erstattungsdatum')}${metric('Erstattete Einheiten', number(m.refunded_units), 'Im gewählten Zeitraum')}${metric('Erstattungsrate', percent(m.refundRate), 'Periodenquote')}</section>
     <h3>Werbeausgaben · nur dieser ASIN zugeordnet</h3>${table(['Werbetyp', 'Ausgaben'], Object.entries(adTypes).map(([type,name]) => `<tr><td>${name}</td><td>${row.ads.some(a => a.ad_type === type) ? money(sumAds(row.ads.filter(a => a.ad_type === type))) : '—'}</td></tr>`), 'Listing-Werbung')}`;
@@ -95,12 +121,23 @@ function showDetail(row) {
   dialog.showModal();
 }
 document.querySelectorAll('[data-view]').forEach(b => b.addEventListener('click', () => { view = b.dataset.view; render(); }));
+function updateModels() {
+  const current = document.querySelector('#product').value;
+  const { models } = selectCatalog(data, { brandId: document.querySelector('#brand').value, categoryId: document.querySelector('#category').value });
+  document.querySelector('#product').innerHTML = `<option value="all">Alle Modelle</option>${models.map(m => `<option value="${escape(m.id)}">${escape(m.name)}</option>`).join('')}`;
+  if (models.some(m => m.id === current)) document.querySelector('#product').value = current;
+}
+for (const id of ['brand', 'category']) document.querySelector(`#${id}`).addEventListener('change', () => { updateModels(); render(); });
 for (const id of ['period', 'product']) document.querySelector(`#${id}`).addEventListener('change', render);
 document.querySelector('#search').addEventListener('input', render);
 document.querySelector('#reset').addEventListener('click', () => {
   document.querySelector('#period').value = '30';
+  document.querySelector('#brand').value = 'all';
+  document.querySelector('#category').value = 'all';
+  updateModels();
   document.querySelector('#product').value = 'all';
   document.querySelector('#search').value = '';
   render();
 });
+updateModels();
 render();

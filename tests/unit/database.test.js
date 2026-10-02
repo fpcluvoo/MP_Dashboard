@@ -13,12 +13,12 @@ test('schema preserves relations, rejects duplicate imports and prevents account
       const stmt = db.prepare(`INSERT INTO ${table} (${columns.join(',')}) VALUES (${columns.map(() => '?').join(',')})`);
       for (const row of rows) stmt.run(...columns.map(c => row[c]));
     }
-    assert.equal(db.prepare('SELECT COUNT(*) AS n FROM listing_daily').get().n, 120);
-    assert.equal(db.prepare('SELECT COUNT(*) AS n FROM marketplace_skus').get().n, 5);
+    assert.equal(db.prepare('SELECT COUNT(*) AS n FROM listing_daily').get().n, 540);
+    assert.equal(db.prepare('SELECT COUNT(*) AS n FROM marketplace_skus').get().n, 19);
     assert.throws(() => db.exec("INSERT INTO listings VALUES ('invalid','amazon-de','missing','B0NEW00001','Invalid')"), /FOREIGN KEY/);
-    assert.throws(() => db.exec("INSERT INTO marketplace_skus VALUES ('duplicate','amazon-de','l-light','AUDIO-BLK-FBA','FBA')"), /UNIQUE/);
+    assert.throws(() => db.exec("INSERT INTO marketplace_skus VALUES ('duplicate','amazon-de','demo-clouvou-smart-seat-black','DEMO-SKU-001-FBA','FBA')"), /UNIQUE/);
     db.exec("INSERT INTO accounts VALUES ('amazon-fr','amazon','FR','EUR','Other account')");
-    assert.throws(() => db.exec("INSERT INTO marketplace_skus VALUES ('cross','amazon-fr','l-light','NEW','FBA')"), /FOREIGN KEY/);
+    assert.throws(() => db.exec("INSERT INTO marketplace_skus VALUES ('cross','amazon-fr','demo-clouvou-smart-seat-black','NEW','FBA')"), /FOREIGN KEY/);
     assert.throws(() => db.exec("INSERT INTO ad_spend SELECT 'duplicate',account_id,listing_id,date,ad_type,spend_cents,source,source_row_id,unassigned_reason FROM ad_spend LIMIT 1"), /UNIQUE/);
     assert.throws(() => db.exec("INSERT INTO ad_spend VALUES ('bad','amazon-de',NULL,'2026-09-01','SP',100,'test','bad',NULL)"), /CHECK/);
     assert.equal(db.prepare('PRAGMA foreign_key_check').all().length, 0);
