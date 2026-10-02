@@ -20,6 +20,8 @@ Wiederverwenden: fachliche Zuordnung Produkt → Listing → SKU, bisherige Demo
 
 ## 3. Sellerboard-Recherche und Evidenzstand
 
+Ergänzung: Eine erste Recherche öffentlich zugänglicher Drittquellen liegt in [SELLERBOARD_RESEARCH.md](SELLERBOARD_RESEARCH.md) vor. Sie trennt gelesene Nutzerberichte und schwache Claims von weiter ungeprüften Herstellerfunktionen. Der folgende Absatz beschreibt die ursprüngliche Einschränkung beim Herstellerzugriff.
+
 Die öffentliche Herstellerseite `https://sellerboard.com/` und der Pfad `https://sellerboard.com/features/` wurden am 02.10.2026 angefragt. Beide Abrufe scheiterten an der Cloud-Netzwerkregel (Proxy CONNECT 403). Deshalb liegen **noch keine verifizierten aktuellen Seiteninhalte** vor. Der Features-Pfad ist ein Rechercheversuch, keine bestätigte Inhaltsquelle. Die Domains `sellerboard.com` und `www.sellerboard.com` wurden als Ergänzung im Konfigurationsentwurf gespeichert; die bisherigen Regeln bleiben erhalten.
 
 Die folgende Tabelle ist unsere **Anforderungsauswahl**, kein behauptetes vollständiges oder aktuell geprüftes Sellerboard-Funktionsinventar. Nach Freigabe der Herstellerseite werden tatsächliche Funktionen und Links ergänzt. Keine Produktentscheidung hängt von einer nicht geprüften Behauptung über Sellerboard ab.
@@ -81,6 +83,8 @@ Die Datenpflege gehört zur Analysegrundlage. Aufträge, Listings oder Kampagnen
 - Responsive Bedienung und Tastaturnavigation; dichte Tabellen dürfen innerhalb ihres Bereichs horizontal scrollen.
 
 ## 5. Der Produktstamm als fachliches Fundament
+
+Die erste bestätigte Sortimentsdefinition steht in [PRODUCT_CATALOG.md](PRODUCT_CATALOG.md), maschinenlesbar in [catalog/assortment.json](../catalog/assortment.json). Marken: Cluvo, Lutivo und Winden Cove; 15 benannte Modelle, fünf weitere unbenannte Bürostuhlmodelle und 18 bestätigte Cluvo-Bürostuhl-Farbvarianten. Fehlende Varianten bleiben ausdrücklich offen.
 
 Eine einzelne Tabelle mit Produktname und ASIN reicht nicht. Wir trennen interne Identität und externe Verkaufsidentität:
 
@@ -238,8 +242,8 @@ Vor Produktivstart: verfügbare Vergangenheit je Quelle, Rate Limits, Berichtsve
 ## 13. Noch offene Angaben — blockieren die ersten Phasen nicht
 
 - Tatsächliche weitere Marktplätze/Konten/Länder neben Amazon.
-- Interne Produktliste, gewünschte Varianten-/Bundle-Struktur und vorhandene Kostenquellen.
-- Ob „Glovo“ die interne Unternehmensbezeichnung oder eine zusätzlich gewünschte Plattform meint; bis zur Klärung bleibt der Projektname Marketplace BI und es wird keine Glovo-API eingeplant.
+- Produktstamm bereits teilweise erfasst: siehe PRODUCT_CATALOG.md. Offen sind insbesondere Winden-Cove-Modellnamen, weitere Farben/Größen/Farbkombinationen, interne SKUs, Zuordnungen und Kostenquellen.
+- Marken gemäß neuer Nutzeraussage: Cluvo, Lutivo, Winden Cove. Keine Glovo-Plattformintegration aus der früheren uneindeutigen Nennung ableiten.
 - Berichtswährung, Steuer-/Kostenkonventionen und benötigte Rollen; Arbeitsannahme: EUR, saubere Trennung brutto/netto, Admin/Analyst/Viewer.
 - Login-/Hosting-Anbieter und Betriebsbudget; Entscheidung vor Phase 5, keine kostenpflichtigen Buchungen in der Planungsphase.
 

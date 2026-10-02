@@ -1,0 +1,622 @@
+{
+  "schema_version": 1,
+  "purpose": "Bestätigte Sortimentsdefinition für das geplante BI-Produkt; keine Verkaufsdaten und keine Marketplace-Verknüpfungen.",
+  "source": {
+    "type": "user_statement",
+    "date": "2026-10-02",
+    "note": "Marken und Modelle gemäß Nutzernachricht; Schreibweisen nicht extern verifiziert."
+  },
+  "id_policy": "IDs sind technische Katalogschlüssel, keine tatsächlichen internen SKUs oder Marketplace-SKUs.",
+  "brands": [
+    {
+      "id": "cluvo",
+      "name": "Cluvo",
+      "source": {
+        "type": "user_statement",
+        "date": "2026-10-02",
+        "note": "Marken und Modelle gemäß Nutzernachricht; Schreibweisen nicht extern verifiziert."
+      }
+    },
+    {
+      "id": "lutivo",
+      "name": "Lutivo",
+      "source": {
+        "type": "user_statement",
+        "date": "2026-10-02",
+        "note": "Marken und Modelle gemäß Nutzernachricht; Schreibweisen nicht extern verifiziert."
+      }
+    },
+    {
+      "id": "winden-cove",
+      "name": "Winden Cove",
+      "source": {
+        "type": "user_statement",
+        "date": "2026-10-02",
+        "note": "Marken und Modelle gemäß Nutzernachricht; Schreibweisen nicht extern verifiziert."
+      }
+    }
+  ],
+  "categories": [
+    {
+      "id": "office-chairs",
+      "name": "Bürostühle"
+    },
+    {
+      "id": "desks",
+      "name": "Schreibtische",
+      "note": "Höhenverstellbarkeit wird als Merkmal pro Modell geführt; konkrete Zuordnung noch offen."
+    },
+    {
+      "id": "gaming-chairs",
+      "name": "Gaming-Stühle"
+    },
+    {
+      "id": "accessories",
+      "name": "Accessories / Upsell-Produkte"
+    }
+  ],
+  "models": [
+    {
+      "id": "cluvo-bright-seat",
+      "brand_id": "cluvo",
+      "category_id": "office-chairs",
+      "name": "Bright Seat",
+      "status": "confirmed",
+      "variant_definition_status": "colors_confirmed",
+      "source": {
+        "type": "user_statement",
+        "date": "2026-10-02",
+        "note": "Marken und Modelle gemäß Nutzernachricht; Schreibweisen nicht extern verifiziert."
+      }
+    },
+    {
+      "id": "cluvo-clever-seat",
+      "brand_id": "cluvo",
+      "category_id": "office-chairs",
+      "name": "Clever Seat",
+      "status": "confirmed",
+      "variant_definition_status": "colors_confirmed",
+      "source": {
+        "type": "user_statement",
+        "date": "2026-10-02",
+        "note": "Marken und Modelle gemäß Nutzernachricht; Schreibweisen nicht extern verifiziert."
+      }
+    },
+    {
+      "id": "cluvo-smart-seat",
+      "brand_id": "cluvo",
+      "category_id": "office-chairs",
+      "name": "Smart Seat",
+      "status": "confirmed",
+      "variant_definition_status": "colors_confirmed",
+      "source": {
+        "type": "user_statement",
+        "date": "2026-10-02",
+        "note": "Marken und Modelle gemäß Nutzernachricht; Schreibweisen nicht extern verifiziert."
+      }
+    },
+    {
+      "id": "cluvo-power-seat",
+      "brand_id": "cluvo",
+      "category_id": "office-chairs",
+      "name": "Power Seat",
+      "status": "confirmed",
+      "variant_definition_status": "colors_confirmed",
+      "source": {
+        "type": "user_statement",
+        "date": "2026-10-02",
+        "note": "Marken und Modelle gemäß Nutzernachricht; Schreibweisen nicht extern verifiziert."
+      }
+    },
+    {
+      "id": "cluvo-pro-seat",
+      "brand_id": "cluvo",
+      "category_id": "office-chairs",
+      "name": "Pro Seat",
+      "status": "confirmed",
+      "variant_definition_status": "colors_confirmed",
+      "source": {
+        "type": "user_statement",
+        "date": "2026-10-02",
+        "note": "Marken und Modelle gemäß Nutzernachricht; Schreibweisen nicht extern verifiziert."
+      }
+    },
+    {
+      "id": "cluvo-master-seat",
+      "brand_id": "cluvo",
+      "category_id": "office-chairs",
+      "name": "Master Seat",
+      "status": "confirmed",
+      "variant_definition_status": "colors_confirmed",
+      "source": {
+        "type": "user_statement",
+        "date": "2026-10-02",
+        "note": "Marken und Modelle gemäß Nutzernachricht; Schreibweisen nicht extern verifiziert."
+      }
+    },
+    {
+      "id": "lutivo-alpha",
+      "brand_id": "lutivo",
+      "category_id": "office-chairs",
+      "name": "Alpha",
+      "status": "confirmed",
+      "variant_definition_status": "pending",
+      "source": {
+        "type": "user_statement",
+        "date": "2026-10-02",
+        "note": "Marken und Modelle gemäß Nutzernachricht; Schreibweisen nicht extern verifiziert."
+      }
+    },
+    {
+      "id": "lutivo-bravo",
+      "brand_id": "lutivo",
+      "category_id": "office-chairs",
+      "name": "Bravo",
+      "status": "confirmed",
+      "variant_definition_status": "pending",
+      "source": {
+        "type": "user_statement",
+        "date": "2026-10-02",
+        "note": "Marken und Modelle gemäß Nutzernachricht; Schreibweisen nicht extern verifiziert."
+      }
+    },
+    {
+      "id": "lutivo-charlie",
+      "brand_id": "lutivo",
+      "category_id": "office-chairs",
+      "name": "Charlie",
+      "status": "confirmed",
+      "variant_definition_status": "pending",
+      "source": {
+        "type": "user_statement",
+        "date": "2026-10-02",
+        "note": "Marken und Modelle gemäß Nutzernachricht; Schreibweisen nicht extern verifiziert."
+      }
+    },
+    {
+      "id": "lutivo-delta",
+      "brand_id": "lutivo",
+      "category_id": "office-chairs",
+      "name": "Delta",
+      "status": "confirmed",
+      "variant_definition_status": "pending",
+      "source": {
+        "type": "user_statement",
+        "date": "2026-10-02",
+        "note": "Marken und Modelle gemäß Nutzernachricht; Schreibweisen nicht extern verifiziert."
+      }
+    },
+    {
+      "id": "cluvo-pro-desk",
+      "brand_id": "cluvo",
+      "category_id": "desks",
+      "name": "Pro Desk",
+      "status": "confirmed",
+      "variant_definition_status": "pending",
+      "size_option_count": 2,
+      "height_adjustable": null,
+      "size_options": null,
+      "color_combinations": null,
+      "source": {
+        "type": "user_statement",
+        "date": "2026-10-02",
+        "note": "Marken und Modelle gemäß Nutzernachricht; Schreibweisen nicht extern verifiziert."
+      }
+    },
+    {
+      "id": "cluvo-clever-desk",
+      "brand_id": "cluvo",
+      "category_id": "desks",
+      "name": "Clever Desk",
+      "status": "confirmed",
+      "variant_definition_status": "pending",
+      "size_option_count": 2,
+      "height_adjustable": null,
+      "size_options": null,
+      "color_combinations": null,
+      "source": {
+        "type": "user_statement",
+        "date": "2026-10-02",
+        "note": "Marken und Modelle gemäß Nutzernachricht; Schreibweisen nicht extern verifiziert."
+      }
+    },
+    {
+      "id": "cluvo-master-desk",
+      "brand_id": "cluvo",
+      "category_id": "desks",
+      "name": "Master Desk",
+      "status": "confirmed",
+      "variant_definition_status": "pending",
+      "size_option_count": 2,
+      "height_adjustable": null,
+      "size_options": null,
+      "color_combinations": null,
+      "source": {
+        "type": "user_statement",
+        "date": "2026-10-02",
+        "note": "Marken und Modelle gemäß Nutzernachricht; Schreibweisen nicht extern verifiziert."
+      }
+    },
+    {
+      "id": "lutivo-foxtrot",
+      "brand_id": "lutivo",
+      "category_id": "desks",
+      "name": "Foxtrot",
+      "status": "confirmed",
+      "variant_definition_status": "pending",
+      "size_option_count": null,
+      "height_adjustable": null,
+      "size_options": null,
+      "color_combinations": null,
+      "source": {
+        "type": "user_statement",
+        "date": "2026-10-02",
+        "note": "Marken und Modelle gemäß Nutzernachricht; Schreibweisen nicht extern verifiziert."
+      }
+    },
+    {
+      "id": "lutivo-golf",
+      "brand_id": "lutivo",
+      "category_id": "desks",
+      "name": "Golf",
+      "status": "confirmed",
+      "variant_definition_status": "pending",
+      "size_option_count": null,
+      "height_adjustable": null,
+      "size_options": null,
+      "color_combinations": null,
+      "source": {
+        "type": "user_statement",
+        "date": "2026-10-02",
+        "note": "Marken und Modelle gemäß Nutzernachricht; Schreibweisen nicht extern verifiziert."
+      }
+    }
+  ],
+  "variants": [
+    {
+      "id": "cluvo-bright-seat-black",
+      "model_id": "cluvo-bright-seat",
+      "color": "Schwarz",
+      "dimensions_mm": null,
+      "internal_sku": null,
+      "gtin": null,
+      "status": "confirmed_color_variant",
+      "source": {
+        "type": "user_statement",
+        "date": "2026-10-02",
+        "note": "Marken und Modelle gemäß Nutzernachricht; Schreibweisen nicht extern verifiziert."
+      }
+    },
+    {
+      "id": "cluvo-bright-seat-anthracite",
+      "model_id": "cluvo-bright-seat",
+      "color": "Anthrazit",
+      "dimensions_mm": null,
+      "internal_sku": null,
+      "gtin": null,
+      "status": "confirmed_color_variant",
+      "source": {
+        "type": "user_statement",
+        "date": "2026-10-02",
+        "note": "Marken und Modelle gemäß Nutzernachricht; Schreibweisen nicht extern verifiziert."
+      }
+    },
+    {
+      "id": "cluvo-bright-seat-cream",
+      "model_id": "cluvo-bright-seat",
+      "color": "Creme",
+      "dimensions_mm": null,
+      "internal_sku": null,
+      "gtin": null,
+      "status": "confirmed_color_variant",
+      "source": {
+        "type": "user_statement",
+        "date": "2026-10-02",
+        "note": "Marken und Modelle gemäß Nutzernachricht; Schreibweisen nicht extern verifiziert."
+      }
+    },
+    {
+      "id": "cluvo-clever-seat-black",
+      "model_id": "cluvo-clever-seat",
+      "color": "Schwarz",
+      "dimensions_mm": null,
+      "internal_sku": null,
+      "gtin": null,
+      "status": "confirmed_color_variant",
+      "source": {
+        "type": "user_statement",
+        "date": "2026-10-02",
+        "note": "Marken und Modelle gemäß Nutzernachricht; Schreibweisen nicht extern verifiziert."
+      }
+    },
+    {
+      "id": "cluvo-clever-seat-anthracite",
+      "model_id": "cluvo-clever-seat",
+      "color": "Anthrazit",
+      "dimensions_mm": null,
+      "internal_sku": null,
+      "gtin": null,
+      "status": "confirmed_color_variant",
+      "source": {
+        "type": "user_statement",
+        "date": "2026-10-02",
+        "note": "Marken und Modelle gemäß Nutzernachricht; Schreibweisen nicht extern verifiziert."
+      }
+    },
+    {
+      "id": "cluvo-clever-seat-cream",
+      "model_id": "cluvo-clever-seat",
+      "color": "Creme",
+      "dimensions_mm": null,
+      "internal_sku": null,
+      "gtin": null,
+      "status": "confirmed_color_variant",
+      "source": {
+        "type": "user_statement",
+        "date": "2026-10-02",
+        "note": "Marken und Modelle gemäß Nutzernachricht; Schreibweisen nicht extern verifiziert."
+      }
+    },
+    {
+      "id": "cluvo-smart-seat-black",
+      "model_id": "cluvo-smart-seat",
+      "color": "Schwarz",
+      "dimensions_mm": null,
+      "internal_sku": null,
+      "gtin": null,
+      "status": "confirmed_color_variant",
+      "source": {
+        "type": "user_statement",
+        "date": "2026-10-02",
+        "note": "Marken und Modelle gemäß Nutzernachricht; Schreibweisen nicht extern verifiziert."
+      }
+    },
+    {
+      "id": "cluvo-smart-seat-anthracite",
+      "model_id": "cluvo-smart-seat",
+      "color": "Anthrazit",
+      "dimensions_mm": null,
+      "internal_sku": null,
+      "gtin": null,
+      "status": "confirmed_color_variant",
+      "source": {
+        "type": "user_statement",
+        "date": "2026-10-02",
+        "note": "Marken und Modelle gemäß Nutzernachricht; Schreibweisen nicht extern verifiziert."
+      }
+    },
+    {
+      "id": "cluvo-smart-seat-cream",
+      "model_id": "cluvo-smart-seat",
+      "color": "Creme",
+      "dimensions_mm": null,
+      "internal_sku": null,
+      "gtin": null,
+      "status": "confirmed_color_variant",
+      "source": {
+        "type": "user_statement",
+        "date": "2026-10-02",
+        "note": "Marken und Modelle gemäß Nutzernachricht; Schreibweisen nicht extern verifiziert."
+      }
+    },
+    {
+      "id": "cluvo-power-seat-black",
+      "model_id": "cluvo-power-seat",
+      "color": "Schwarz",
+      "dimensions_mm": null,
+      "internal_sku": null,
+      "gtin": null,
+      "status": "confirmed_color_variant",
+      "source": {
+        "type": "user_statement",
+        "date": "2026-10-02",
+        "note": "Marken und Modelle gemäß Nutzernachricht; Schreibweisen nicht extern verifiziert."
+      }
+    },
+    {
+      "id": "cluvo-power-seat-anthracite",
+      "model_id": "cluvo-power-seat",
+      "color": "Anthrazit",
+      "dimensions_mm": null,
+      "internal_sku": null,
+      "gtin": null,
+      "status": "confirmed_color_variant",
+      "source": {
+        "type": "user_statement",
+        "date": "2026-10-02",
+        "note": "Marken und Modelle gemäß Nutzernachricht; Schreibweisen nicht extern verifiziert."
+      }
+    },
+    {
+      "id": "cluvo-power-seat-cream",
+      "model_id": "cluvo-power-seat",
+      "color": "Creme",
+      "dimensions_mm": null,
+      "internal_sku": null,
+      "gtin": null,
+      "status": "confirmed_color_variant",
+      "source": {
+        "type": "user_statement",
+        "date": "2026-10-02",
+        "note": "Marken und Modelle gemäß Nutzernachricht; Schreibweisen nicht extern verifiziert."
+      }
+    },
+    {
+      "id": "cluvo-pro-seat-black",
+      "model_id": "cluvo-pro-seat",
+      "color": "Schwarz",
+      "dimensions_mm": null,
+      "internal_sku": null,
+      "gtin": null,
+      "status": "confirmed_color_variant",
+      "source": {
+        "type": "user_statement",
+        "date": "2026-10-02",
+        "note": "Marken und Modelle gemäß Nutzernachricht; Schreibweisen nicht extern verifiziert."
+      }
+    },
+    {
+      "id": "cluvo-pro-seat-anthracite",
+      "model_id": "cluvo-pro-seat",
+      "color": "Anthrazit",
+      "dimensions_mm": null,
+      "internal_sku": null,
+      "gtin": null,
+      "status": "confirmed_color_variant",
+      "source": {
+        "type": "user_statement",
+        "date": "2026-10-02",
+        "note": "Marken und Modelle gemäß Nutzernachricht; Schreibweisen nicht extern verifiziert."
+      }
+    },
+    {
+      "id": "cluvo-pro-seat-cream",
+      "model_id": "cluvo-pro-seat",
+      "color": "Creme",
+      "dimensions_mm": null,
+      "internal_sku": null,
+      "gtin": null,
+      "status": "confirmed_color_variant",
+      "source": {
+        "type": "user_statement",
+        "date": "2026-10-02",
+        "note": "Marken und Modelle gemäß Nutzernachricht; Schreibweisen nicht extern verifiziert."
+      }
+    },
+    {
+      "id": "cluvo-master-seat-black",
+      "model_id": "cluvo-master-seat",
+      "color": "Schwarz",
+      "dimensions_mm": null,
+      "internal_sku": null,
+      "gtin": null,
+      "status": "confirmed_color_variant",
+      "source": {
+        "type": "user_statement",
+        "date": "2026-10-02",
+        "note": "Marken und Modelle gemäß Nutzernachricht; Schreibweisen nicht extern verifiziert."
+      }
+    },
+    {
+      "id": "cluvo-master-seat-anthracite",
+      "model_id": "cluvo-master-seat",
+      "color": "Anthrazit",
+      "dimensions_mm": null,
+      "internal_sku": null,
+      "gtin": null,
+      "status": "confirmed_color_variant",
+      "source": {
+        "type": "user_statement",
+        "date": "2026-10-02",
+        "note": "Marken und Modelle gemäß Nutzernachricht; Schreibweisen nicht extern verifiziert."
+      }
+    },
+    {
+      "id": "cluvo-master-seat-cream",
+      "model_id": "cluvo-master-seat",
+      "color": "Creme",
+      "dimensions_mm": null,
+      "internal_sku": null,
+      "gtin": null,
+      "status": "confirmed_color_variant",
+      "source": {
+        "type": "user_statement",
+        "date": "2026-10-02",
+        "note": "Marken und Modelle gemäß Nutzernachricht; Schreibweisen nicht extern verifiziert."
+      }
+    }
+  ],
+  "assortment_groups": [
+    {
+      "brand_id": "winden-cove",
+      "category_id": "office-chairs",
+      "confirmed_model_count": 5,
+      "models_status": "names_pending",
+      "note": "Keine erfundenen Modellnamen oder Platzhalterprodukte."
+    },
+    {
+      "brand_id": "cluvo",
+      "category_id": "gaming-chairs",
+      "confirmed_model_count": null,
+      "models_status": "planned_names_pending",
+      "note": "Gaming-Stühle kommen dazu; derzeit nur Cluvo vorgesehen."
+    },
+    {
+      "brand_id": "cluvo",
+      "category_id": "accessories",
+      "confirmed_model_count": null,
+      "models_status": "names_pending",
+      "note": "Aktuell nur Cluvo; genannte Produkttypen sind Beispiele, keine bestätigten Artikel."
+    }
+  ],
+  "category_examples": [
+    {
+      "category_id": "accessories",
+      "name": "Mauspad",
+      "status": "illustrative_not_confirmed_product"
+    },
+    {
+      "category_id": "accessories",
+      "name": "Stehmatte für Steharbeitsplätze",
+      "status": "illustrative_not_confirmed_product"
+    },
+    {
+      "category_id": "accessories",
+      "name": "Ergonomisches Sitzkissen",
+      "status": "illustrative_not_confirmed_product"
+    },
+    {
+      "category_id": "accessories",
+      "name": "Fußstütze",
+      "status": "illustrative_not_confirmed_product"
+    }
+  ],
+  "marketplace_mappings": [],
+  "open_items": [
+    {
+      "id": "brand-spelling",
+      "scope": "brands",
+      "question": "Bei abweichender Schreibweise Cluvo, Lutivo oder Winden Cove korrigieren; aktuell wörtlich übernommen."
+    },
+    {
+      "id": "winden-cove-models",
+      "scope": "winden-cove/office-chairs",
+      "question": "Die fünf Modellnamen und deren Varianten ergänzen."
+    },
+    {
+      "id": "lutivo-chair-variants",
+      "scope": "lutivo/office-chairs",
+      "question": "Farben und sonstige Varianten je Alpha, Bravo, Charlie und Delta ergänzen."
+    },
+    {
+      "id": "cluvo-desk-variants",
+      "scope": "cluvo/desks",
+      "question": "Je Modell die beiden Maße sowie tatsächlich verkaufte Farbkombinationen (Platte/Gestell) ergänzen."
+    },
+    {
+      "id": "lutivo-desk-variants",
+      "scope": "lutivo/desks",
+      "question": "Maße, Anzahl Größen und tatsächlich verkaufte Farbkombinationen je Foxtrot und Golf ergänzen."
+    },
+    {
+      "id": "desk-adjustability",
+      "scope": "desks",
+      "question": "Höhenverstellbarkeit je Tischmodell bestätigen."
+    },
+    {
+      "id": "gaming-models",
+      "scope": "cluvo/gaming-chairs",
+      "question": "Modelle, Farben und weitere Varianten ergänzen."
+    },
+    {
+      "id": "accessory-models",
+      "scope": "cluvo/accessories",
+      "question": "Konkrete Artikel/Modellnamen und Varianten ergänzen; Beispiele sind noch keine Artikelliste."
+    },
+    {
+      "id": "sku-mapping",
+      "scope": "all",
+      "question": "Interne SKUs/GTINs und tatsächliche Marketplace-Konto-, ASIN- und Seller-SKU-Zuordnungen später importieren."
+    }
+  ]
+}
