@@ -1,5 +1,7 @@
 # MP Dashboard · Amazon Analytics
 
+Der verbindliche nächste Ausbau ist in [docs/PRODUCT_PLAN.md](docs/PRODUCT_PLAN.md) geplant: Marketplace BI, Demo zuerst, gemeinsame Reporting-Verträge und späterer API-/Login-Betrieb. Der folgende Abschnitt beschreibt den bereits implementierten Stand.
+
 Amazon-DE-Dashboard auf ASIN-Ebene mit einer lokalen Produktdatenbank als Grundlage für spätere Marketplace-Importe. Node.js 24, JavaScript, SQLite (Node `node:sqlite`), Vite und Playwright.
 
 ## Funktionsumfang
