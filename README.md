@@ -44,3 +44,14 @@ Die Tests prüfen Kennzahlen, kombinierte Filter, Zurücksetzen, JavaScript-Fehl
 ## Cloud-Umgebung
 
 Das Checkout liegt unter `/workspace/MP_Dashboard`. In dieser Umgebung npm mit `--cache /workspace/.npm-cache` ausführen, da der Standardcache im Home-Verzeichnis nicht beschreibbar ist. Es werden keine Secrets oder externen Dienste für die Demo benötigt. Nach einer neuen Sitzung `npm run dev -- --port 5173 --strictPort` starten. Laufende Prozesse werden nicht als Bestandteil des Umgebungssnapshots vorausgesetzt.
+
+## Öffentliche Demo auf GitHub Pages
+
+Der Workflow `.github/workflows/pages.yml` testet und baut die Anwendung bei jedem Push auf `main` und veröffentlicht `dist` auf GitHub Pages. Die Website zeigt ausschließlich die oben beschriebenen Beispieldaten.
+
+Einmalig unter **Settings → Pages → Build and deployment → Source** die Option **GitHub Actions** auswählen. Falls der erste Workflow vor der Aktivierung fehlgeschlagen ist, unter **Actions → Deploy dashboard to GitHub Pages → Run workflow** erneut starten. Bei privaten Repositories hängt die Verfügbarkeit von GitHub Pages vom GitHub-Tarif ab; das Repository muss für diese Einrichtung nicht öffentlich gestellt werden.
+
+Nach einem erfolgreichen Deploy ist die erwartete Adresse:
+https://fpcluvoo.github.io/MP_Dashboard/
+
+Der relative Vite-Basispfad stellt sicher, dass JavaScript und CSS auch unter dem Repository-Unterpfad geladen werden.
