@@ -84,7 +84,7 @@ Die Datenpflege gehört zur Analysegrundlage. Aufträge, Listings oder Kampagnen
 
 ## 5. Der Produktstamm als fachliches Fundament
 
-Die erste bestätigte Sortimentsdefinition steht in [PRODUCT_CATALOG.md](PRODUCT_CATALOG.md), maschinenlesbar in [catalog/assortment.json](../catalog/assortment.json). Marken: Cluvo, Lutivo und Winden Cove; 15 benannte Modelle, fünf weitere unbenannte Bürostuhlmodelle und 18 bestätigte Cluvo-Bürostuhl-Farbvarianten. Fehlende Varianten bleiben ausdrücklich offen.
+Die erste bestätigte Sortimentsdefinition steht in [PRODUCT_CATALOG.md](PRODUCT_CATALOG.md), maschinenlesbar in [catalog/assortment.json](../catalog/assortment.json). Marken: Clouvou, Lutivo und Wintoncove; 15 benannte Modelle, fünf weitere unbenannte Bürostuhlmodelle und 18 bestätigte Clouvou-Bürostuhl-Farbvarianten. Fehlende Varianten bleiben ausdrücklich offen.
 
 Eine einzelne Tabelle mit Produktname und ASIN reicht nicht. Wir trennen interne Identität und externe Verkaufsidentität:
 
@@ -242,8 +242,8 @@ Vor Produktivstart: verfügbare Vergangenheit je Quelle, Rate Limits, Berichtsve
 ## 13. Noch offene Angaben — blockieren die ersten Phasen nicht
 
 - Tatsächliche weitere Marktplätze/Konten/Länder neben Amazon.
-- Produktstamm bereits teilweise erfasst: siehe PRODUCT_CATALOG.md. Offen sind insbesondere Winden-Cove-Modellnamen, weitere Farben/Größen/Farbkombinationen, interne SKUs, Zuordnungen und Kostenquellen.
-- Marken gemäß neuer Nutzeraussage: Cluvo, Lutivo, Winden Cove. Keine Glovo-Plattformintegration aus der früheren uneindeutigen Nennung ableiten.
+- Produktstamm bereits teilweise erfasst: siehe PRODUCT_CATALOG.md. Offen sind insbesondere Wintoncove-Modellnamen, weitere Farben/Größen/Farbkombinationen, interne SKUs, Zuordnungen und Kostenquellen.
+- Marken gemäß neuer Nutzeraussage: Clouvou, Lutivo, Wintoncove. Keine Glovo-Plattformintegration aus der früheren uneindeutigen Nennung ableiten.
 - Berichtswährung, Steuer-/Kostenkonventionen und benötigte Rollen; Arbeitsannahme: EUR, saubere Trennung brutto/netto, Admin/Analyst/Viewer.
 - Login-/Hosting-Anbieter und Betriebsbudget; Entscheidung vor Phase 5, keine kostenpflichtigen Buchungen in der Planungsphase.
 

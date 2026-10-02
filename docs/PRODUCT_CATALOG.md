@@ -4,30 +4,30 @@ Stand: 02.10.2026. Quelle: direkte Nutzeraussage in diesem Projekt. Arbeitsgrund
 
 ## Marken und Kategorien
 
-Marken werden vorerst genau so geschrieben: **Cluvo**, **Lutivo**, **Winden Cove**. Diese Schreibweisen sind vom Nutzertext übernommen und noch nicht durch Produktunterlagen bestätigt. Die frühere uneindeutige Bezeichnung „Glovo“ wird nicht als zusätzliche Marke oder Marketplace-Anforderung verwendet.
+Die vom Nutzer ausdrücklich bestätigten Markenschreibweisen sind **Clouvou**, **Lutivo** und **Wintoncove**. Die frühere uneindeutige Bezeichnung „Glovo“ wird nicht als zusätzliche Marke oder Marketplace-Anforderung verwendet.
 
 Kategorien: **Bürostühle**, **Schreibtische**, **Gaming-Stühle**, **Accessories / Upsell-Produkte**. Höhenverstellbarkeit wird zunächst als Merkmal der Schreibtische vorgesehen. Welche genannten Tischmodelle höhenverstellbar sind, ist noch nicht ausdrücklich zugeordnet.
 
-Gaming-Stühle sind als Erweiterung unter Cluvo vorgesehen. Accessories werden aktuell ebenfalls nur unter Cluvo verkauft. Daraus folgt keine dauerhafte Beschränkung des Datenmodells auf diese Marke. Für weitere Marken/Kategorien ist nichts zusätzlich zugesagt.
+Gaming-Stühle sind als Erweiterung unter Clouvou vorgesehen. Accessories werden aktuell ebenfalls nur unter Clouvou verkauft. Daraus folgt keine dauerhafte Beschränkung des Datenmodells auf diese Marke. Für weitere Marken/Kategorien ist nichts zusätzlich zugesagt.
 
 ## Bestätigte Modelle und Varianten
 
 | Marke | Kategorie | Modelle | Bestätigte Varianten / noch offen |
 | --- | --- | --- | --- |
-| Cluvo | Bürostühle | Bright Seat, Clever Seat, Smart Seat, Power Seat, Pro Seat, Master Seat | Jedes Modell: Schwarz, Anthrazit, Creme. Insgesamt 18 bestätigte Farbvarianten. |
-| Lutivo | Bürostühle | Alpha, Bravo, Charlie, Delta | Farben und weitere Varianten noch offen; Cluvo-Farben werden nicht übertragen. |
-| Winden Cove | Bürostühle | Fünf Modelle, Namen werden nachgereicht | Farben und weitere Varianten offen; noch keine einzelnen Produktdatensätze. |
-| Cluvo | Schreibtische | Pro Desk, Clever Desk, Master Desk | Je Modell zwei Größen, Maße und Farbkombinationen werden nachgereicht. |
+| Clouvou | Bürostühle | Bright Seat, Clever Seat, Smart Seat, Power Seat, Pro Seat, Master Seat | Jedes Modell: Schwarz, Anthrazit, Creme. Insgesamt 18 bestätigte Farbvarianten. |
+| Lutivo | Bürostühle | Alpha, Bravo, Charlie, Delta | Farben und weitere Varianten noch offen; Clouvou-Farben werden nicht übertragen. |
+| Wintoncove | Bürostühle | Fünf Modelle, Namen werden nachgereicht | Farben und weitere Varianten offen; noch keine einzelnen Produktdatensätze. |
+| Clouvou | Schreibtische | Pro Desk, Clever Desk, Master Desk | Je Modell zwei Größen, Maße und Farbkombinationen werden nachgereicht. |
 | Lutivo | Schreibtische | Foxtrot, Golf | Verschiedene Größen und Farben; konkrete Anzahl/Optionen noch offen. |
-| Cluvo | Gaming-Stühle | Namen und Anzahl offen | Kommende Sortimentserweiterung. |
-| Cluvo | Accessories / Upsell | Konkrete Artikel/Modelle offen | Mauspad, Stehmatte, ergonomisches Sitzkissen und Fußstütze wurden als Beispiele genannt. |
+| Clouvou | Gaming-Stühle | Namen und Anzahl offen | Kommende Sortimentserweiterung. |
+| Clouvou | Accessories / Upsell | Konkrete Artikel/Modelle offen | Mauspad, Stehmatte, ergonomisches Sitzkissen und Fußstütze wurden als Beispiele genannt. |
 
-**Zählstand:** drei Marken, 15 namentlich bekannte Modelle (zehn Bürostuhl- und fünf Tischmodelle), zusätzlich fünf noch unbenannte Winden-Cove-Bürostuhlmodelle. Damit sind 20 Modelle nach Name oder Anzahl beschrieben, zuzüglich noch nicht bezifferter Gaming-/Accessory-Modelle. Nur die 18 Cluvo-Bürostuhl-Farbvarianten sind bisher konkret ableitbar. Die Gesamtzahl verkaufbarer Varianten ist noch nicht bekannt.
+**Zählstand:** drei Marken, 15 namentlich bekannte Modelle (zehn Bürostuhl- und fünf Tischmodelle), zusätzlich fünf noch unbenannte Wintoncove-Bürostuhlmodelle. Damit sind 20 Modelle nach Name oder Anzahl beschrieben, zuzüglich noch nicht bezifferter Gaming-/Accessory-Modelle. Nur die 18 Clouvou-Bürostuhl-Farbvarianten sind bisher konkret ableitbar. Die Gesamtzahl verkaufbarer Varianten ist noch nicht bekannt.
 
 ## Struktur für die Auswertung
 
 ```text
-Marke: Cluvo
+Marke: Clouvou
   Kategorie: Bürostühle
     Modell / Produktfamilie: Bright Seat
       Variante: Schwarz
@@ -38,7 +38,7 @@ Marke: Cluvo
       Variante: Creme
 ```
 
-Ein Modell entspricht vorerst einer Produktfamilie. Eine Farbe/Größe/Farbkombination ist eine verkaufbare Variante. Marke und Kategorie sind getrennte Dimensionen: Dadurch können wir beispielsweise alle Cluvo-Produkte, alle Bürostühle über Marken hinweg oder nur Bright Seat über alle Marktplätze vergleichen.
+Ein Modell entspricht vorerst einer Produktfamilie. Eine Farbe/Größe/Farbkombination ist eine verkaufbare Variante. Marke und Kategorie sind getrennte Dimensionen: Dadurch können wir beispielsweise alle Clouvou-Produkte, alle Bürostühle über Marken hinweg oder nur Bright Seat über alle Marktplätze vergleichen.
 
 Bei Tischen werden Maße (Breite/Tiefe in einer normalisierten Einheit) und Farbkombinationen von Platte/Gestell als getrennte Merkmale vorbereitet. Es werden nur tatsächlich bestätigte Kombinationen als Varianten angelegt. Zwei Größen mal mehrere Farben bedeutet nicht automatisch, dass jede Kombination verkauft wird.
 
@@ -46,10 +46,10 @@ Interne technische IDs sind nicht eure tatsächlichen Artikelnummern. ASIN, GTIN
 
 ## Noch nachzureichen
 
-1. Fünf Winden-Cove-Bürostuhlnamen mit Varianten.
+1. Fünf Wintoncove-Bürostuhlnamen mit Varianten.
 2. Farben/Varianten der vier Lutivo-Bürostühle.
 3. Maße und tatsächlich angebotene Platte-/Gestell-Farbkombinationen pro Tischmodell; Höhenverstellbarkeit je Modell.
-4. Gaming-Stuhlmodelle und Varianten unter Cluvo.
+4. Gaming-Stuhlmodelle und Varianten unter Clouvou.
 5. Konkrete Accessories statt der bisherigen Beispiele.
 6. Später: interne Artikelnummern, Kosten und Marketplace-Zuordnungen.
 
