@@ -77,3 +77,7 @@ Siehe [Betriebsanleitung](../../backend/README.md). 12 Stream-Typen werden mit 5
 Vor echten Daten: Herstellerverträge/Scopes bestätigen, Seller-/Ads-Konten autorisieren, Zeitzonen und Historienfenster prüfen, Referenzberichte abgleichen, echte SKU-Zuordnungen einrichten. Backfill-Fenster, Rate Limits und Report-Latenzen sind konto-/reportabhängig und werden nicht pauschal garantiert. Bestellungen mit Änderungszeit abrufen; spätere Korrekturen mit bewusstem Überlappungsfenster und erneuten Reports einlesen.
 
 Danach folgen Ledger-/Refund-Normalisierung, geprüfte Zuordnung zum Produktstamm, ein privater Query-Service für das UI, PostgreSQL/Migrationen, Queue/Scheduler, Login/Rollen, Monitoring und Backups. Die öffentliche Pages-Demo bleibt unabhängig davon. Ein API-Token allein ersetzt diese Betriebsbausteine nicht.
+
+## Erweiterung: Kosten und Abrechnungen
+
+[Profit und Kosten](../PROFIT.md) ergänzt das obige Inventar: Gebühren-Breakdowns, eBay-Positionsgebühren/Gutschriften, OTTO-Belegpositionen/Steuermap, Amazon-Settlement-Download und Kaufland-Bookings-Reportjob. SKU-Kostenhistorie und Profitberechnung sind implementiert; reale steuerliche Klassifikation und Quellenabgleich bleiben Voraussetzung. Die ursprüngliche Tabelle beschreibt weiterhin den Ausgangsstand der zwölf Basis-Streams.

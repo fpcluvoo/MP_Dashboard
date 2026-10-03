@@ -6,11 +6,14 @@ export function summarize(rows) {
   const sums = Object.fromEntries(fields.map(field => [field, rows.length && rows.every(r => r[field] != null) ? rows.reduce((n, r) => n + r[field], 0) : null]));
   return { ...sums, conversion: ratio(sums.units, sums.sessions), refundRate: ratio(sums.refunded_units, sums.units), transactionViewRate: ratio(sums.transactions,sums.page_views) };
 }
-export function analytics(data, { start, end, productId = 'all', brandId = 'all', categoryId = 'all', query = '', accountId = data.accountId }) {
+export function analytics(data, { start, end, productId = 'all', brandId = 'all', categoryId = 'all', query = '', accountId = data.accountId, accountIds = [accountId] }) {
   const inPeriod = r => r.date >= start && r.date <= end;
-  const account = data.accounts.find(a => a.id === accountId);
-  const listings = data.listings.filter(l => l.account_id === account.id);
-  const periodAds = data.ad_spend.filter(a => a.account_id === account.id && inPeriod(a));
+  const selectedAccounts=data.accounts.filter(a=>accountIds.includes(a.id));
+  if(!selectedAccounts.length)throw new Error('No account selected');
+  if(new Set(selectedAccounts.map(a=>a.currency)).size>1)throw new Error('Convert currencies before combining accounts');
+  const account = selectedAccounts.length===1?selectedAccounts[0]:{id:'combined',currency:selectedAccounts[0].currency,marketplace:selectedAccounts.every(a=>a.marketplace==='amazon')?'amazon':'mixed'};
+  const listings = data.listings.filter(l => accountIds.includes(l.account_id));
+  const periodAds = data.ad_spend.filter(a => accountIds.includes(a.account_id) && inPeriod(a));
   const needle = query.toLocaleLowerCase('de-DE').trim();
   const rows = listings.map(listing => {
     const product = { ...data.products.find(p => p.id === listing.product_id), ...data.catalog?.models.find(p => p.id === listing.product_id) };
@@ -24,7 +27,7 @@ export function analytics(data, { start, end, productId = 'all', brandId = 'all'
   }).filter(l => (productId === 'all' || l.product_id === productId) && (brandId === 'all' || l.product.brand_id === brandId) && (categoryId === 'all' || l.product.category_id === categoryId) && [l.title, l.external_id, l.product.name, l.product.internal_sku, ...l.skus.map(s => s.sku)].join(' ').toLocaleLowerCase('de-DE').includes(needle));
   const assigned = rows.flatMap(r => r.ads);
   const unassigned = periodAds.filter(a => a.listing_id == null);
-  const sumSpend = ads => ads.reduce((sum, a) => sum + a.spend_cents, 0);
+  const sumSpend = ads => ads.some(a=>a.spend_cents==null)?null:ads.reduce((sum, a) => sum + a.spend_cents, 0);
   return {
     account, rows, metrics: summarize(rows.map(r => r.metrics)),
     assignedSpend: rows.length && assigned.length ? sumSpend(assigned) : null, unassignedSpend: unassigned.length ? sumSpend(unassigned) : null, accountSpend: periodAds.length ? sumSpend(periodAds) : null,

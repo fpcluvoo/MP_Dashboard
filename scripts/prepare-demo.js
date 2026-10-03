@@ -1,6 +1,8 @@
 import { DatabaseSync } from 'node:sqlite';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import { euroDemo } from '../profit/fx.js';
+import { profitDemo } from '../profit/demo.js';
 import { demoData, assortment } from '../database/demo.js';
 
 const root = new URL('../', import.meta.url);
@@ -19,6 +21,6 @@ try {
   }
   db.exec('COMMIT');
   const data = Object.fromEntries(Object.keys(tables).map(table => [table, db.prepare(`SELECT * FROM ${table}`).all()]));
-  writeFileSync(new URL('src/data/demo.generated.json', root), JSON.stringify({ mode: 'demo', catalog: assortment, accountId: 'amazon-de', start: '2026-09-01', end: '2026-09-30', ...data }));
+  writeFileSync(new URL('src/data/demo.generated.json', root), JSON.stringify({ mode: 'demo', catalog: assortment, accountId: 'amazon-de', start: '2026-09-01', end: '2026-09-30', fx: euroDemo(data), profit: profitDemo(data), ...data }));
   console.log(`Demo database ready: ${data.products.length} products, ${data.listings.length} ASINs, ${data.marketplace_skus.length} SKUs. Synthetic snapshot exported.`);
 } finally { db.close(); }

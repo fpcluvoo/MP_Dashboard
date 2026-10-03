@@ -1,4 +1,5 @@
-import {money,minorMoney} from './money.js';
+import {amazonFinanceDetails,ebayFinanceDetails,ottoReceiptDetails} from './finance-details.js';
+import {money,minorMoney,decimal,micros} from './money.js';
 const required=(value,name)=>{if(value==null||value==='')throw new Error(`Missing ${name}`);return value;};
 const count=value=>{if(value==null)return null;if(!Number.isSafeInteger(value)||value<0)throw new Error('Invalid count');return value;};
 const list=(v,name)=>{if(!Array.isArray(v))throw new Error(`Invalid ${name}`);return v;};
@@ -15,7 +16,7 @@ export function normalize(stream,payload,context) {
     rows=list(payload.orders,'orders').flatMap(o=>list(o.orderItems,'orderItems').map(r=>base(`${required(o.orderId,'orderId')}/${required(r.orderItemId,'orderItemId')}`,{date:o.createdTime,externalId:r.product?.asin??null,sku:r.product?.sellerSku??null,currency:r.proceeds?.proceedsTotal?.currencyCode??currency,
       orderId:required(o.orderId,'orderId'),status:o.fulfillment?.fulfillmentStatus??null,measures:{units:count(r.quantityOrdered),sales:money(r.proceeds?.proceedsTotal?.amount)},basis:'order-item-proceeds'})));
   } else if(stream==='amazon.finances') {
-    rows=list(payload.payload?.transactions,'transactions').map(r=>base(r.transactionId,{date:r.postedDate,currency:r.totalAmount?.currencyCode??currency,status:r.transactionStatus,eventType:r.transactionType,measures:{transactionAmount:money(r.totalAmount?.currencyAmount)},basis:'financial-event'}));
+    rows=list(payload.payload?.transactions,'transactions').map(r=>base(r.transactionId,{date:r.postedDate,currency:r.totalAmount?.currencyCode??currency,status:r.transactionStatus,eventType:r.transactionType,financialDetails:amazonFinanceDetails(r),measures:{transactionAmount:money(r.totalAmount?.currencyAmount)},basis:'financial-event'}));
   } else if(stream==='amazon.inventory') {
     rows=list(payload.payload?.inventorySummaries,'inventorySummaries').map(r=>base(required(r.sellerSku,'sellerSku'),{grain:'snapshot',date:context.asOf??periodEnd,externalId:r.asin??null,sku:r.sellerSku,measures:{stock:count(r.totalQuantity),fulfillable:count(r.inventoryDetails?.fulfillableQuantity)},basis:'inventory-snapshot'}));
   } else if(stream==='amazonAds.report') {
@@ -42,15 +43,15 @@ export function normalize(stream,payload,context) {
         measures:{pageViews:count(mapped.LISTING_VIEWS_TOTAL),impressions:count(mapped.LISTING_IMPRESSION_TOTAL),transactions:count(mapped.TRANSACTION_COUNT)},basis:'ebay-traffic',sourceUpdatedAt:payload.lastUpdatedDate});
     });
   } else if(stream==='ebay.finances') {
-    rows=list(payload.transactions,'transactions').map(r=>base(r.transactionId,{date:r.transactionDate,currency:r.amount?.currency??currency,eventType:r.transactionType,bookingEntry:r.bookingEntry,orderId:r.orderId??null,
+    rows=list(payload.transactions,'transactions').map(r=>base(`${required(r.transactionType,'transactionType')}/${required(r.transactionId,'transactionId')}`,{financialDetails:ebayFinanceDetails(r),date:r.transactionDate,currency:r.amount?.currency??currency,eventType:r.transactionType,bookingEntry:r.bookingEntry,orderId:r.orderId??null,
       measures:{transactionAmount:money(r.amount?.value)},basis:'financial-event'}));
   } else if(stream==='otto.orders') {
     rows=list(payload.resources,'resources').flatMap(o=>list(o.positionItems,'positionItems').map(r=>base(`${required(o.salesOrderId,'salesOrderId')}/${required(r.positionItemId,'positionItemId')}`,{date:o.orderDate,orderId:o.salesOrderId,externalId:r.product?.articleNumber??null,sku:r.product?.sku??null,status:r.fulfillmentStatus,
       currency:(r.itemValueReducedGrossPrice??r.itemValueGrossPrice)?.currency??currency,
       measures:{units:1,sales:money((r.itemValueReducedGrossPrice??r.itemValueGrossPrice)?.amount)},basis:'reduced-gross-item-price'})));
   } else if(stream==='otto.receipts') {
-    rows=list(payload.resources,'resources').map(r=>base(r.receiptNumber,{date:r.creationDate,orderId:r.salesOrderId??null,eventType:r.type,currency:r.total?.gross?.currency??currency,
-      measures:{receiptGross:money(r.total?.gross?.amount),receiptNet:money(r.total?.net?.amount),tax:money(r.total?.vat?.amount)},basis:'receipt'}));
+    rows=list(payload.resources,'resources').map(r=>base(r.receiptNumber,{financialDetails:ottoReceiptDetails(r),date:r.creationDate,orderId:r.salesOrderId??null,eventType:r.type,currency:r.total?.gross?.currency??currency,
+      measures:{receiptGross:money(r.total?.gross?.amount),receiptNet:money(r.total?.net?.amount),tax:r.total?.vat&&Object.values(r.total.vat).length&&Object.values(r.total.vat).every(v=>v?.amount!=null)?decimal(Object.values(r.total.vat).reduce((n,v)=>n+micros(v.amount),0n)):null},basis:'receipt'}));
   } else if(stream==='kaufland.orders') {
     rows=list(payload.data,'data').map(r=>base(r.id_order_unit,{date:r.ts_created_iso,orderId:r.id_order,externalId:r.product?.id_product==null?null:String(r.product.id_product),sku:r.id_offer??null,status:r.status,currency:r.currency??currency,
       measures:{units:1,sales:r.price==null?null:minorMoney(r.price),settlementGross:r.revenue_gross==null?null:minorMoney(r.revenue_gross),settlementNet:r.revenue_net==null?null:minorMoney(r.revenue_net)},basis:'order-unit-price'}));

@@ -1,0 +1,18 @@
+{
+  "expectedRevision": 0,
+  "actor": "local-admin",
+  "cost": {
+    "accountId": "amazon-de",
+    "sku": "REPLACE-WITH-REAL-SKU",
+    "currency": "EUR",
+    "validFrom": "2026-09-01",
+    "purchase": "58.00",
+    "fulfillment": "8.50",
+    "packaging": "1.50",
+    "inbound": "2.00",
+    "duty": "1.00",
+    "special": "0.00",
+    "fulfillmentSource": "marketplace",
+    "note": "Example only; replace amounts and effective date before import"
+  }
+}

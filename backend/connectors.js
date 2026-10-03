@@ -14,7 +14,7 @@ export class DirectConnector {
   async request(path,{method='GET',body}={}) {
     const url=new URL(path,this.origin);
     if(url.origin!==this.origin||url.username||url.password)throw new Error('Untrusted provider URL');
-    const reportPaths={amazon:'/reports/2021-06-30/reports',amazonAds:'/reporting/reports'};
+    const reportPaths={amazon:'/reports/2021-06-30/reports',amazonAds:'/reporting/reports',kaufland:'/v2/reports/bookings-new'};
     if(method!=='GET'&&!(method==='POST'&&url.pathname===reportPaths[this.provider]))throw new Error('Business write operations are disabled');
     const encoded=body===undefined?undefined:JSON.stringify(body);
     for(let authAttempt=0;authAttempt<2;authAttempt++) {
@@ -82,6 +82,22 @@ export class DirectConnector {
     if(['FAILURE','FAILED','CANCELLED'].includes(r.status))throw new Error(`Report ${r.status}`);
     return r.status==='COMPLETED'?{ready:true,url:r.url,compression:'GZIP'}:{ready:false,status:r.status};
   }
+  async listAmazonSettlements(query={}) {
+    if(this.provider!=='amazon')throw new Error('Amazon only');
+    const p=new URLSearchParams({reportTypes:'GET_V2_SETTLEMENT_REPORT_DATA_FLAT_FILE_V2',...query});
+    return this.request(`/reports/2021-06-30/reports?${p}`);
+  }
+  async requestKauflandBookings({start,end}) {
+    if(this.provider!=='kaufland')throw new Error('Kaufland only');
+    return this.request(`/v2/reports/bookings-new?storefront=${encodeURIComponent(this.account.storefront)}&version=v2`,{method:'POST',body:{date_from:start,date_to:end}});
+  }
+  async pollKauflandBookings(reportId) {
+    if(this.provider!=='kaufland')throw new Error('Kaufland only');
+    const r=(await this.request(`/v2/reports/${encodeURIComponent(reportId)}`)).data;
+    const status=String(r?.status).toUpperCase();
+    if(['FAILED','ERROR','CANCELLED'].includes(status))throw new Error('Bookings report failed');
+    return status==='DONE'?{ready:true,url:r.url,format:'text'}:{ready:false,status};
+  }
   async downloadReport(job) {
     const url=new URL(job.url);
     if(!job.ready||url.protocol!=='https:'||url.username||url.password||!this.approvedDownloadHosts.includes(url.hostname))throw new Error('Report download host must be explicitly approved');
@@ -89,6 +105,7 @@ export class DirectConnector {
     let bytes=await this.transport.bytes(url.href,{headers:{}});
     if(job.compression==='GZIP')bytes=gunzipSync(bytes,{maxOutputLength:32*1024*1024});
     else if(job.compression)throw new Error('Unsupported report compression');
+    if(job.format==='text')return bytes.toString('utf8');
     try{return JSON.parse(bytes.toString('utf8'));}catch{throw new Error('Invalid report JSON');}
   }
 }

@@ -56,3 +56,7 @@ SQLite ist ein lokales Fundament. Ein einzelner Worker darf die CLI verwenden; v
 Ein abgeschlossener Reportjob wird nicht stillschweigend neu angefordert. Korrekturabrufe brauchen bewusst neue Jobs. Ein Timeout bei Report-Erstellung kann trotz fehlender Antwort einen Providerjob erzeugt haben; vor Wiederholung dort abgleichen. Report-Zeilen, die später entfallen, werden noch nicht automatisch aus alten Imports entfernt. Verschiedene überlappende Periodenreports nicht addieren; der Kennzahlenhelfer weist unterschiedliche Perioden zurück. Mehrere Bestandsstichtage werden ebenfalls nicht summiert.
 
 Importierte Facts verbleiben unter `.data/private-imports/integrations.sqlite`. Sie werden **nicht** in die öffentliche Demo exportiert. Produktmapping, Refund-/Gebührenledger und ein privater Reporting-Query-Service sind die nächste Implementierungsstufe; die aktuelle öffentliche UI nutzt weiterhin ihren isolierten synthetischen Snapshot. Vor Live-Betrieb sind Referenzabgleich und reale Sandbox-/Kontotests erforderlich.
+
+## Kosten und Abrechnungen
+
+`CostStore` speichert versionierte SKU-Stückkosten privat mit Revisionsschutz und Audit. Die lokalen CLIs `scripts/costs.js`, `scripts/profit.js`, `scripts/fetch-settlement.js` und `scripts/import-settlement.js` verwalten Kosten, berechnen geprüfte Profit-Eingaben und beziehen/importieren Abrechnungen. Keine dieser Strecken läuft im öffentlichen Build. [Vollständige Anleitung und Grenzen](../docs/PROFIT.md). Noch kein gehosteter Admin-HTTP-Dienst.

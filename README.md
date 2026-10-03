@@ -16,6 +16,12 @@ Marken und Modellnamen stammen aus dem bestätigten Sortiment **Clouvou, Lutivo 
 
 Neun getrennte Amazon-Kanäle: DE, FR, IT, ES, NL, BE, PL, GB und US. eBay/Kaufland zunächst Deutschland. 216 synthetische Listings, EUR/GBP/PLN/USD ohne Währungsmischung; eBay-Pageviews bleiben getrennt von Amazon-Sessions. OTTO-/Kaufland-Traffic und nicht belegte Werbung werden als unbekannt dargestellt. Der Reiter **Datenquellen & APIs** zeigt Importstatus, Quellfelder und Grenzen.
 
+## Profit und Euro-Reporting
+
+**Profit & Kosten** zeigt Deckungsbeitrag und Marge mit Kostenabdeckung. SKU-Kosten sind in der Demo mit Gültigkeitsdatum bearbeitbar; das private Backend besitzt Kostenhistorie und Auditprotokoll. Gebührenbelege aus Amazon/eBay, OTTO-Belegdetails und Kaufland-Buchungsreports sind vorbereitet. [Definitionen, Abrechnungsquellen und Bedienung](docs/PROFIT.md).
+
+Filter für Einzelländer, Amazon gesamt und alle Marktplätze; Euro-Anzeige mit synthetischen Tageskursen und einsehbaren Originalbeträgen. Für echte historische Kurse und reale Kosten ist noch Quellenabgleich erforderlich.
+
 ## Entwicklung
 
 ```sh

@@ -54,7 +54,7 @@ test('all mobile sections fit the viewport and missing ratings are explicit', as
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');
   await expect(page.getByText('Nicht verfügbar', { exact: true }).first()).toBeVisible();
-  for (const name of ['Verkauf & Traffic', 'Erstattungen', 'Werbung', 'Produktstamm', 'Datenquellen & APIs']) {
+  for (const name of ['Verkauf & Traffic', 'Erstattungen', 'Werbung', 'Produktstamm', 'Profit & Kosten', 'Datenquellen & APIs']) {
     await page.getByRole('button', { name, exact: true }).click();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   }
@@ -87,8 +87,11 @@ test('catalog shows all brands and pending details without fake variants', async
 
 test('direct channels keep currencies and traffic definitions separate', async ({page}) => {
  await page.goto('/');
- await expect(page.getByLabel('Marktplatz / Land').locator('option')).toHaveCount(12);
+ await expect(page.getByLabel('Marktplatz / Land').locator('option')).toHaveCount(14);
  await page.getByLabel('Marktplatz / Land').selectOption('amazon-us');
+ await expect(page.getByTestId('revenue')).toContainText('€');
+ await expect(page.getByTestId('revenue').locator('[title]')).toHaveAttribute('title',/\$/);
+ await page.getByLabel('Anzeigewährung').selectOption('original');
  await expect(page.getByTestId('revenue')).toContainText('$');
  await page.getByLabel('Marktplatz / Land').selectOption('amazon-pl');
  await expect(page.getByTestId('revenue')).toContainText('PLN');
@@ -105,4 +108,29 @@ test('direct channels keep currencies and traffic definitions separate', async (
  await expect(page.getByText('Nicht verbunden · Vertragstests erfolgreich')).toBeVisible();
  await page.getByLabel('Marktplatz / Land').selectOption('kaufland-de');
  await expect(page.getByRole('heading',{name:'Direktanbindung · Kaufland Deutschland'})).toBeVisible();
+});
+
+
+test('profit costs persist locally, keep history and block missing purchase costs',async({page})=>{
+ await page.goto('/');await page.getByRole('button',{name:'Profit & Kosten',exact:true}).click();
+ await expect(page.getByTestId('profit-value')).not.toHaveText('—');
+ const before=await page.getByTestId('profit-value').innerText();
+ await page.getByLabel('Kosten Einkauf',{exact:true}).fill('90');
+ await page.getByRole('button',{name:'Kostenversion speichern',exact:true}).click();
+ await expect(page.getByTestId('profit-value')).not.toHaveText(before);
+ await expect(page.getByRole('status')).toContainText('Kostenversion gespeichert');
+ const changed=await page.getByTestId('profit-value').innerText();await page.reload();
+ await page.getByRole('button',{name:'Profit & Kosten',exact:true}).click();await expect(page.getByTestId('profit-value')).toHaveText(changed);
+ await page.getByLabel('Kosten gültig ab').fill('2026-09-20');await page.getByLabel('Kosten Einkauf',{exact:true}).fill('');
+ await page.getByRole('button',{name:'Kostenversion speichern',exact:true}).click();await expect(page.getByTestId('profit-value')).toHaveText('—');
+ await page.getByRole('button',{name:'Demo-Kosten zurücksetzen',exact:true}).click();await expect(page.getByTestId('profit-value')).toHaveText(before);
+});
+test('all marketplaces and Amazon countries aggregate only in EUR with accessible originals',async({page})=>{
+ await page.goto('/');await page.getByLabel('Marktplatz / Land').selectOption('amazon-all');
+ await expect(page.getByTestId('listing-row')).toHaveCount(162);await expect(page.getByTestId('revenue')).toContainText('€');
+ await expect(page.getByLabel('Anzeigewährung')).toBeDisabled();
+ await page.getByText('Originalbeträge & Wechselkurse',{exact:true}).click();await expect(page.locator('.originals')).toContainText('PLN');
+ await page.getByLabel('Marktplatz / Land').selectOption('all');await expect(page.getByTestId('listing-row')).toHaveCount(216);
+ await page.getByRole('button',{name:'Profit & Kosten',exact:true}).click();await expect(page.getByTestId('profit-value')).toHaveText('—');
+ await expect(page.getByTestId('profit-before-ads')).not.toHaveText('—');
 });

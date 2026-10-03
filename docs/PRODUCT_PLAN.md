@@ -252,3 +252,7 @@ Diese Angaben verfeinern Importadapter und Betrieb, nicht das beschlossene Produ
 ## Stand 03.10.2026 · Direktkanäle vorgezogen
 
 Die Demo enthält zwölf Kanäle, 216 synthetische Listings, getrennte Währungen/Traffic-Definitionen und eine Datenquellenansicht. Zwölf private Importstrecken besitzen Authentifizierung, Pagination beziehungsweise Reportjobs, Normalisierung und idempotente Speicherung; 52 synthetische Konto-/Stream-Kombinationen sind geprüft. [Recherche und Grenzen](api/README.md) trennen inventarisierte Daten von tatsächlich normalisierten Feldern. Dies schließt keine der oben definierten Phasen pauschal ab: React/TypeScript-Migration, vollständiger Reporting-Query-Vertrag, Ledger, reale Kontoprüfung, Login und gehosteter Betrieb bleiben offen. ChannelEngine und der weitere genannte Aggregator werden erst im nächsten Schritt untersucht.
+
+## Ausbau Profit und EUR-Reporting
+
+Kostenhistorie, lokale private Kostenverwaltung, Abrechnungsdetails und eine mit dem Browser geteilte Deckungsbeitragsrechnung sind umgesetzt. Die Demo bietet SKU-Kostenpflege, Marge, Kostenabdeckung und Multi-Konto-EUR-Reporting mit synthetischen Tageskursen. [Profit-Vertrag](PROFIT.md). Reale Kosten-/Steuerzuordnung, FX-Quelle, allgemeine Betriebskosten sowie privates Hosting/Login bleiben offen; die öffentliche Demo speichert Kostenänderungen nur im jeweiligen Browser.
