@@ -7,7 +7,7 @@ const root = new URL('../', import.meta.url);
 mkdirSync(new URL('.data/', root), { recursive: true });
 mkdirSync(new URL('src/data/', root), { recursive: true });
 // This database is exclusively synthetic. Never point this builder at a production DB.
-const db = new DatabaseSync(fileURLToPath(new URL('.data/demo-assortment-v1.sqlite', root)));
+const db = new DatabaseSync(fileURLToPath(new URL('.data/demo-direct-channels-v1.sqlite', root)));
 try {
   db.exec(readFileSync(new URL('database/schema.sql', root), 'utf8'));
   db.exec('BEGIN');

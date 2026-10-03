@@ -11,11 +11,13 @@
     "build": "vite build",
     "preview": "vite preview --host 0.0.0.0",
     "test": "npm run test:unit && playwright test",
-    "data:prepare": "node scripts/prepare-demo.js",
+    "data:prepare": "node scripts/prepare-demo.js && npm run integrations:demo",
     "predev": "npm run data:prepare",
     "prebuild": "npm run data:prepare",
     "test:unit": "node --test tests/unit/*.test.js",
-    "db:init": "node scripts/init-database.js"
+    "db:init": "node scripts/init-database.js",
+    "integrations:demo": "node scripts/integrations-demo.js",
+    "backend:check": "node --use-env-proxy scripts/integrations-demo.js"
   },
   "devDependencies": {
     "@playwright/test": "1.63.0",

@@ -60,3 +60,5 @@ Die Reihenfolge blockiert die Definition der bereits bekannten Modelle nicht. Nu
 Der Katalog steuert jetzt den Produktstamm und die Marken-/Kategorie-/Modellfilter der Live-Demo. Alle 15 benannten Modelle sowie die noch offenen Sortimentsgruppen sind sichtbar. Die 18 bestätigten Clouvou-Bürostuhl-Farbvarianten erhalten simulierte Kennzahlen und ausdrücklich mit `DEMO-` gekennzeichnete externe IDs. Echte Marketplace-Zuordnungen bleiben in der Definitionsdatei leer.
 
 Die früheren Demoartikel (Kopfhörer, Lampe, Becher) wurden aus dem aktuellen Snapshot entfernt. Für Lutivo, Wintoncove und Tischmodelle ohne bestätigte Varianten werden keine Varianten oder Kennzahlen erfunden. Die lokale echte Katalogdatenbank wird nicht überschrieben oder veröffentlicht; vollständige Mapping-Historien und produktive Imports bleiben Bestandteil des geplanten Fundament-Ausbaus.
+
+Die Direktkanal-Demo bildet diese 18 Varianten auf zwölf synthetischen Konten ab (216 Listings): neun Amazon-Länder plus eBay DE, OTTO und Kaufland DE. Das ist keine Bestätigung realer Listings in diesen Ländern. Der Katalog und seine noch offenen tatsächlichen Zuordnungen bleiben davon getrennt.

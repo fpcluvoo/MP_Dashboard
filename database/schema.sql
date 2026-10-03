@@ -75,3 +75,12 @@ CREATE TABLE IF NOT EXISTS ad_spend (
         (listing_id IS NOT NULL AND unassigned_reason IS NULL))
 ) STRICT;
 CREATE INDEX IF NOT EXISTS ad_spend_period ON ad_spend(account_id, date);
+
+-- Traffic definitions are channel-specific; pageviews are never stored as sessions.
+CREATE TABLE IF NOT EXISTS traffic_daily (
+  listing_id TEXT NOT NULL REFERENCES listings(id),
+  date TEXT NOT NULL,
+  page_views INTEGER CHECK(page_views >= 0),
+  transactions INTEGER CHECK(transactions >= 0),
+  PRIMARY KEY(listing_id,date)
+) STRICT;

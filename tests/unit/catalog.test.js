@@ -7,10 +7,10 @@ test('demo covers only confirmed color variants and keeps actual mappings empty'
   const d = data();
   assert.deepEqual(d.catalog.brands.map(b => b.name), ['Clouvou','Lutivo','Wintoncove']);
   assert.equal(d.products.length, 15);
-  assert.equal(d.listings.length, 18);
+  assert.equal(d.listings.length, 216);
   assert.equal(d.catalog.marketplace_mappings.length, 0);
   assert.ok(d.catalog.variants.every(v => v.internal_sku === null && v.gtin === null));
-  assert.ok(d.listings.every(l => l.external_id.startsWith('DEMO-') && d.catalog.variants.some(v => `demo-${v.id}` === l.id)));
+  assert.ok(d.listings.every(l => l.external_id.startsWith('DEMO-') && d.catalog.variants.some(v => l.id.endsWith(`demo-${v.id}`))));
   assert.equal(selectCatalog(d, {brandId:'lutivo'}).models.length, 6);
   assert.equal(selectCatalog(d, {brandId:'lutivo', categoryId:'desks'}).models.length, 2);
   const pending = selectCatalog(d, {brandId:'wintoncove'});

@@ -43,7 +43,7 @@ test('ad overhead stays separate from filtered listing spend; refunds and produc
   await page.getByLabel('Zeitraum').selectOption('7');
   await expect(page.getByTestId('unassigned-spend')).toHaveText(/143,50\s*€/);
   await page.getByRole('button', { name: 'Erstattungen', exact: true }).click();
-  await expect(page.getByRole('heading', { name: 'Erstattungen nach ASIN' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Erstattungen nach Listing' })).toBeVisible();
   await expect(page.getByTestId('refund-amount')).not.toHaveText('—');
   await page.getByRole('button', { name: 'Produktstamm', exact: true }).click();
   await expect(page.getByRole('region', { name: 'Produktstamm', exact: true })).toContainText('Bright Seat');
@@ -54,7 +54,7 @@ test('all mobile sections fit the viewport and missing ratings are explicit', as
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');
   await expect(page.getByText('Nicht verfügbar', { exact: true }).first()).toBeVisible();
-  for (const name of ['Verkauf & Traffic', 'Erstattungen', 'Werbung', 'Produktstamm']) {
+  for (const name of ['Verkauf & Traffic', 'Erstattungen', 'Werbung', 'Produktstamm', 'Datenquellen & APIs']) {
     await page.getByRole('button', { name, exact: true }).click();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   }
@@ -83,4 +83,26 @@ test('catalog shows all brands and pending details without fake variants', async
   await page.getByLabel('Modell', {exact:true}).selectOption('clouvou-bright-seat');
   await page.getByLabel('Marke', {exact:true}).selectOption('lutivo');
   await expect(page.getByLabel('Modell', {exact:true})).toHaveValue('all');
+});
+
+test('direct channels keep currencies and traffic definitions separate', async ({page}) => {
+ await page.goto('/');
+ await expect(page.getByLabel('Marktplatz / Land').locator('option')).toHaveCount(12);
+ await page.getByLabel('Marktplatz / Land').selectOption('amazon-us');
+ await expect(page.getByTestId('revenue')).toContainText('$');
+ await page.getByLabel('Marktplatz / Land').selectOption('amazon-pl');
+ await expect(page.getByTestId('revenue')).toContainText('PLN');
+ await page.getByLabel('Marktplatz / Land').selectOption('ebay-de');
+ await expect(page.getByTestId('sessions')).not.toHaveText('—');
+ await expect(page.getByText('Transaktionen / Views', {exact:true}).first()).toBeVisible();
+ await page.getByLabel('Marktplatz / Land').selectOption('otto-de');
+ await expect(page.getByTestId('sessions')).toHaveText('—');
+ await expect(page.getByTestId('conversion')).toHaveText('—');
+ await page.getByRole('button',{name:'Werbung',exact:true}).click();
+ await expect(page.getByTestId('account-spend')).toHaveText('—');
+ await page.getByRole('button',{name:'Datenquellen & APIs',exact:true}).click();
+ await expect(page.getByRole('heading',{name:'Direktanbindung · OTTO'})).toBeVisible();
+ await expect(page.getByText('Nicht verbunden · Vertragstests erfolgreich')).toBeVisible();
+ await page.getByLabel('Marktplatz / Land').selectOption('kaufland-de');
+ await expect(page.getByRole('heading',{name:'Direktanbindung · Kaufland Deutschland'})).toBeVisible();
 });

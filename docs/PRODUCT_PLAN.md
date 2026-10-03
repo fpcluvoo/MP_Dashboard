@@ -208,7 +208,7 @@ Nicht alle Kanäle liefern jede KPI. Die Demo muss diese Einschränkung sichtbar
 | 5 — Produktionsgerüst mit Demodaten | eigene Staging-Website, PostgreSQL, Backend/Worker, echtes Login/Rollen, Migrationen, synthetischer Importadapter, Backups | dieselben Vertrags-/UI-Tests bestehen über HTTP; unberechtigte/mandantenfremde Abfragen scheitern; Wiederherstellung und Import-Replay geprüft |
 | 6 — Echte Quellen schrittweise | Amazon Verkauf/Traffic → Gebühren/Erstattungen → Ads → weitere genehmigte Quellen/Marktplätze | je Quelle historischer Import, Abgleich mit Referenzberichten, Korrekturen/Retry/Deduplizierung, Monitoring und Datenschutz geprüft |
 
-Phase 0/1 ist der **nächste Arbeitsblock**. Keine weiteren isolierten Dashboard-Kacheln vor dem Fundament. Jede Phase erhält im Repository eine kurze Abnahmeliste und ein Demo-Release. Neue Wünsche werden zunächst einem Bereich und einer Phase zugeordnet; sie unterbrechen keinen laufenden Block ohne bewusste Prioritätsänderung.
+Die Direktanbindungs-Vorbereitung wurde auf ausdrücklichen Nutzerwunsch vorgezogen; siehe den folgenden Stand und `docs/api/README.md`. Phase 0/1 bleibt für das vollständige Produktfundament offen. Keine weiteren isolierten Dashboard-Kacheln vor dem Fundament. Jede Phase erhält im Repository eine kurze Abnahmeliste und ein Demo-Release. Neue Wünsche werden zunächst einem Bereich und einer Phase zugeordnet; sie unterbrechen keinen laufenden Block ohne bewusste Prioritätsänderung.
 
 ### Definition „Demo fertig“
 
@@ -241,10 +241,14 @@ Vor Produktivstart: verfügbare Vergangenheit je Quelle, Rate Limits, Berichtsve
 
 ## 13. Noch offene Angaben — blockieren die ersten Phasen nicht
 
-- Tatsächliche weitere Marktplätze/Konten/Länder neben Amazon.
+- Bestätigt: Amazon DE/FR/IT/ES/NL/BE/PL/GB/US sowie eBay, OTTO und Kaufland. Weitere Aggregatoren folgen separat.
 - Produktstamm bereits teilweise erfasst: siehe PRODUCT_CATALOG.md. Offen sind insbesondere Wintoncove-Modellnamen, weitere Farben/Größen/Farbkombinationen, interne SKUs, Zuordnungen und Kostenquellen.
 - Marken gemäß neuer Nutzeraussage: Clouvou, Lutivo, Wintoncove. Keine Glovo-Plattformintegration aus der früheren uneindeutigen Nennung ableiten.
 - Berichtswährung, Steuer-/Kostenkonventionen und benötigte Rollen; Arbeitsannahme: EUR, saubere Trennung brutto/netto, Admin/Analyst/Viewer.
 - Login-/Hosting-Anbieter und Betriebsbudget; Entscheidung vor Phase 5, keine kostenpflichtigen Buchungen in der Planungsphase.
 
 Diese Angaben verfeinern Importadapter und Betrieb, nicht das beschlossene Produktfundament. Keine Kalender- oder Budgetzusage, bevor Phasen 0/1 technisch und fachlich eingegrenzt sind.
+
+## Stand 03.10.2026 · Direktkanäle vorgezogen
+
+Die Demo enthält zwölf Kanäle, 216 synthetische Listings, getrennte Währungen/Traffic-Definitionen und eine Datenquellenansicht. Zwölf private Importstrecken besitzen Authentifizierung, Pagination beziehungsweise Reportjobs, Normalisierung und idempotente Speicherung; 52 synthetische Konto-/Stream-Kombinationen sind geprüft. [Recherche und Grenzen](api/README.md) trennen inventarisierte Daten von tatsächlich normalisierten Feldern. Dies schließt keine der oben definierten Phasen pauschal ab: React/TypeScript-Migration, vollständiger Reporting-Query-Vertrag, Ledger, reale Kontoprüfung, Login und gehosteter Betrieb bleiben offen. ChannelEngine und der weitere genannte Aggregator werden erst im nächsten Schritt untersucht.

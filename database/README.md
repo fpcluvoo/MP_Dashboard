@@ -4,11 +4,11 @@
 
 `products` ist der marktplatzunabhängige Produktstamm mit stabiler ID und interner SKU. `accounts` beschreibt den Seller-Kontext einschließlich Marketplace, Land und Währung. Ein `listing` gehört genau einem internen Produkt und Konto; für Amazon ist `external_id` die Child-ASIN. Verschiedene Varianten können einem gemeinsamen internen Produkt zugeordnet werden. Es findet keine automatische Parent-ASIN-Zusammenführung statt.
 
-`marketplace_skus` ordnet Seller-SKUs einem Listing zu. Mehrere FBA-/FBM-SKUs dürfen dieselbe ASIN verwenden. Die SKU ist nur innerhalb des Kontos eindeutig. Fremdschlüssel verhindern Verknüpfungen über Kontogrenzen hinweg. Neue Marktplätze benötigen später einen Importadapter; die aktuelle Oberfläche ist bewusst Amazon DE / EUR.
+`marketplace_skus` ordnet Seller-SKUs einem Listing zu. Mehrere FBA-/FBM-SKUs dürfen dieselbe ASIN verwenden. Die SKU ist nur innerhalb des Kontos eindeutig. Fremdschlüssel verhindern Verknüpfungen über Kontogrenzen hinweg. Neue Marktplätze benötigen später einen Importadapter; die Oberfläche bietet nun zwölf getrennte Konto-/Länderkontexte in EUR, GBP, PLN und USD.
 
 `listing_daily` hat genau einen Datensatz je Listing und Datum. Diese Tatsachentabelle wird nie über die SKU-Tabelle vervielfacht. Umsatz und Einheiten müssen vor einem späteren Import auf denselben ASIN-/Tageskontext normalisiert werden. Kennzahlen aus verschiedenen Berichten dürfen nicht addiert werden, wenn sie denselben Umsatz beschreiben. Eine Zuordnung von SKU zu ASIN kann der spätere Import übernehmen; unklare Zuordnungen müssen zur manuellen Prüfung zurückgehalten werden.
 
-`rating_snapshots` speichert Bewertungsstände. `ad_spend` enthält normalisierte Werbekosten mit stabiler Quellzeilen-ID: jede Zeile entweder mit Listing-Bezug oder mit NULL-Listing und Begründung. Der Unique-Key aus Konto, Quelle und Quellzeilen-ID verhindert doppelte Importe. Bei künftigen Imports dürfen Kampagnensummen nicht zusätzlich zu bereits enthaltenen ASIN-Kosten importiert werden. Tatsächliche Import-/Upsert-Logik und Schema-Migrationen für spätere Änderungen sind noch zu implementieren.
+`rating_snapshots` speichert Bewertungsstände. `ad_spend` enthält normalisierte Werbekosten mit stabiler Quellzeilen-ID: jede Zeile entweder mit Listing-Bezug oder mit NULL-Listing und Begründung. Der Unique-Key aus Konto, Quelle und Quellzeilen-ID verhindert doppelte Importe. Bei künftigen Imports dürfen Kampagnensummen nicht zusätzlich zu bereits enthaltenen ASIN-Kosten importiert werden. Die getrennte private API-Fact-Datenbank besitzt bereits Upsert-/Lauf-/Checkpoint-Logik (siehe `backend/store.js`); die Überführung in diese Reporting-Tabellen und Schema-Migrationen bleiben offen.
 
 ## Kennzahlenvertrag
 
@@ -34,3 +34,7 @@ Kein automatischer Import oder Zugang ist bereits eingerichtet. Keine organische
 `npm run db:init`: leere lokale `.data/catalog.sqlite` ohne Export. `npm run data:prepare`: separate synthetische Demo-Datenbank und öffentlicher Demo-Snapshot. Ein wiederholter Demolauf fügt nur fehlende Seed-Zeilen hinzu; Änderungen an bereits vorhandenen Beispieldaten benötigen einen bewussten Neuaufbau ausschließlich der Demo-Datenbank. Produktivdaten gehören in einen privaten Backend-Dienst mit Migrationen, Backups und Zugangskontrolle; die aktuelle Pages-Website besitzt keine Server-Datenbank.
 
 Der aktuelle Demo-Seed wird aus `catalog/assortment.json` abgeleitet. Nur bestätigte Farbvarianten erhalten klar synthetische Listings; alle benannten Modelle sind zusätzlich im Produktstamm sichtbar. Die Exportdatei enthält die Sortimentsmetadaten getrennt von simulierten Verkaufsdaten. Echte Katalogzuordnungen bleiben leer. Die frühere `demo.sqlite` bleibt erhalten und wird nicht in diesen Snapshot aufgenommen.
+
+## Erweiterung Direktkanäle
+
+`traffic_daily` hält Pageviews und Transaktionen getrennt von Amazon-Sessions. Die Demo-Datei heißt jetzt `.data/demo-direct-channels-v1.sqlite` (216 Listings, 6.480 Listing-Tage); frühere Demo-Datenbanken bleiben erhalten. Die privaten API-Facts verwenden Dezimalstrings statt Demo-Centbeträgen und enthalten Quelle, Umsatzbasis, Berichtszeitraum, Granularität und gegebenenfalls Attribution. Ihre Daten werden nicht in den öffentlichen Build übernommen. Details und noch fehlende Ledger-/Mapping-Schritte: [API-Verträge](../docs/api/README.md).

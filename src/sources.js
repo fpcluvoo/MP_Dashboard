@@ -1,0 +1,15 @@
+import {providers,streams,capabilityMatrix,channels} from '../integrations/registry.js';
+const esc=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+export function sourcesView(account,results) {
+ const channel=channels.find(c=>c.id===account.id);
+ const provider=providers[channel.provider];
+ const selected=streams.filter(s=>s.provider===channel.provider||channel.provider==='amazon'&&s.provider==='amazonAds');
+ return `<section class="panel"><div class="panel-heading"><h2>Direktanbindung · ${esc(channel.label)}</h2><span class="status pending">Nicht verbunden · Vertragstests erfolgreich</span></div>
+ <p class="table-note">${esc(provider.auth)} · ${esc(channel.currency)} · ${esc(channel.timeZone)}${channel.marketplaceId?` · Marketplace ${esc(channel.marketplaceId)}`:''}. Keine Zugangsdaten hinterlegt und keine Live-API-Abfrage ausgeführt.</p>
+ <div class="notice"><strong>Vorbereitet, noch nicht live geprüft.</strong> ${esc(provider.caveat)} ${esc(provider.evidence)}.</div>
+ <h3>Vorbereitete Importstrecken</h3><div class="table-scroll"><table><thead><tr><th>Datensatz</th><th>Quellfelder · Auszug</th><th>Testdaten-Import</th></tr></thead><tbody>${selected.map(s=>{const r=results.find(r=>r.accountId===account.id&&r.stream===s.id);return `<tr><td>${esc(s.label)}</td><td class="catalog-description">${esc(s.fields.join(', '))}</td><td>${r?`${r.rows} synthetische Datensätze geprüft`:'Noch ungetestet'}</td></tr>`;}).join('')}</tbody></table></div>
+ <p class="table-note">Die Adapter normalisieren derzeit einen Teil dieser Quellfelder. Finanzpositionen, Gebühren- und Erstattungszuordnungen benötigen noch weitere Normalisierung und Abgleich. Die Dashboard-Zahlen sind separat simuliert.</p><h3>Für eine echte Verbindung erforderlich</h3><p class="table-note">${provider.needs.map(esc).join(' · ')}. Schlüssel werden ausschließlich im privaten Backend verwaltet.</p>
+ <a class="listing-link" href="${esc(provider.docs)}" target="_blank" rel="noopener noreferrer">Hersteller-Dokumentation ↗</a></section>
+ <section class="panel"><div class="panel-heading"><h2>Datenverfügbarkeit & Grenzen</h2><span>Keine fehlenden Werte als Null ausgeben</span></div><div class="table-scroll"><table><thead><tr><th>Kennzahl</th><th>Quelle</th><th>Einordnung</th></tr></thead><tbody>${capabilityMatrix.filter(r=>r[1]===channel.provider||channel.provider==='amazon'&&r[1]==='amazonAds').map(r=>`<tr><td>${esc(r[0])}</td><td>${esc(r[2])}</td><td class="catalog-description">${esc(r[3])}</td></tr>`).join('')}</tbody></table></div></section>
+ <section class="panel"><div class="panel-heading"><h2>Berechenbare Kennzahlen</h2><span>Nur bei passenden Eingabedaten</span></div><p class="table-note">Einheiten, Umsatz und Ø Preis; Amazon Unit Session %; eBay Transaktionen/Pageviews; Erstattungsquote bei gleichem Zeitbezug; CTR, CPC, ACoS und ROAS mit explizitem Attributionsfenster. Gewinn bleibt ohne vollständige Warenkosten, Steuern und Gebühren unbekannt. Keine automatische Vermischung von EUR, GBP, PLN und USD.</p></section>`;
+}
