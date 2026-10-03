@@ -20,7 +20,11 @@ Neun getrennte Amazon-Kanäle: DE, FR, IT, ES, NL, BE, PL, GB und US. eBay/Kaufl
 
 **Profit & Kosten** zeigt Deckungsbeitrag und Marge mit Kostenabdeckung. SKU-Kosten sind in der Demo mit Gültigkeitsdatum bearbeitbar; das private Backend besitzt Kostenhistorie und Auditprotokoll. Gebührenbelege aus Amazon/eBay, OTTO-Belegdetails und Kaufland-Buchungsreports sind vorbereitet. [Definitionen, Abrechnungsquellen und Bedienung](docs/PROFIT.md).
 
-Filter für Einzelländer, Amazon gesamt und alle Marktplätze; Euro-Anzeige mit synthetischen Tageskursen und einsehbaren Originalbeträgen. Für echte historische Kurse und reale Kosten ist noch Quellenabgleich erforderlich.
+Freie Kanal-Mehrfachauswahl über Kacheln, mit Schnellaktionen für alle Kanäle oder nur Amazon; Euro-Anzeige mit synthetischen Tageskursen und einsehbaren Originalbeträgen. Für echte historische Kurse und reale Kosten ist noch Quellenabgleich erforderlich.
+
+## Gesamtüberblick und Werbung
+
+Der Standardreiter **Gesamtüberblick** zeigt MER/Blended ROAS, aggregierten ACoS, TACoS und attribuierten Ads-ROAS für die gewählten Kanäle. Datenabdeckung und Originalbeträge sind sichtbar; der Kanalvergleich führt direkt in Listings und zurück zur vorherigen Auswahl. Produktfilter gelten für die Detailbereiche. [Kennzahlenvertrag und Grenzen](marketing/README.md).
 
 ## Entwicklung
 

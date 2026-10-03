@@ -9,6 +9,8 @@ try {
   document.querySelector('#app').innerHTML = '<main class="load-error"><h1>Demodaten konnten nicht geladen werden</h1><p>Bitte lade die Seite erneut.</p></main>';
   throw error;
 }
+import {blendedReport} from '../marketing/calculate.js';
+import {overviewView} from './overview.js';
 import {euroData} from '../profit/fx.js';
 import {profitView,bindProfit,loadDemoCosts} from './profit.js';
 import { analytics, adTypes } from './analytics.js';
@@ -27,10 +29,12 @@ const money=(v,original)=>{const shown=formatMoney(v,activeAccount.currency);ret
 const number = v => v == null ? '—' : new Intl.NumberFormat('de-DE').format(v);
 const percent = v => v == null ? '—' : new Intl.NumberFormat('de-DE', { style: 'percent', maximumFractionDigits: 1 }).format(v);
 const escape = v => String(v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let view = 'sales';
-const tabs = { sales: 'Verkauf & Traffic', refunds: 'Erstattungen', ads: 'Werbung', catalog: 'Produktstamm', profit: 'Profit & Kosten', sources: 'Datenquellen & APIs' };
+let view = 'overview';
+let selectedAccounts=new Set([data.accountId]);
+let previousSelection=null;
+const tabs = { overview: 'Gesamtüberblick', sales: 'Verkauf & Traffic', refunds: 'Erstattungen', ads: 'Werbung', catalog: 'Produktstamm', profit: 'Profit & Kosten', sources: 'Datenquellen & APIs' };
 const metric = (name, value, note, id, primary = false) => `<article class="metric ${primary ? 'primary' : ''}"><p>${name}</p><strong ${id ? `data-testid="${id}"` : ''}>${value}</strong><small>${note}</small></article>`;
-const sumAds = rows => rows.reduce((n, r) => n + r.spend_cents, 0);
+const sumAds = rows => rows.some(r=>r.spend_cents==null)?null:rows.reduce((n, r) => n + r.spend_cents, 0);
 const rating = row => row.rating?.rating == null ? '<span class="muted">Nicht verfügbar</span>' : `<span class="stars">★</span> ${number(row.rating.rating)} <small>(${number(row.rating.rating_count)})</small><small class="subline">Stand ${escape(row.rating.date)}</small>`;
 
 document.querySelector('#app').innerHTML = `
@@ -43,8 +47,12 @@ document.querySelector('#app').innerHTML = `
       const count = data.catalog.models.filter(m => m.brand_id === b.id).length;
       return `<article><span class="brand-wordmark">${escape(b.name)}</span><small>${count ? `${count} benannte Modelle` : '5 Bürostuhlmodelle · Namen folgen'}</small></article>`;
     }).join('')}</section>
+    <section class="channel-picker" aria-labelledby="channel-picker-title"><div class="panel-heading"><h2 id="channel-picker-title">Marktplätze auswählen</h2><span id="channel-selection-summary" aria-live="polite"></span></div>
+      <div class="channel-actions"><button id="select-all-channels">Alle auswählen</button><button id="select-amazon-channels">Nur Amazon</button><button id="clear-channels">Auswahl leeren</button><button id="back-channels" hidden>Zur Kanalauswahl zurück</button></div>
+      <div class="channel-tiles" role="group" aria-label="Marktplatz-Mehrfachauswahl">${data.accounts.map(a=>`<label class="channel-choice"><input type="checkbox" data-channel="${escape(a.id)}" aria-label="${escape(a.name.replace(' · Demo',''))}" ${a.id===data.accountId?'checked':''}><span><strong>${escape(a.name.replace(' · Demo',''))}</strong><small>${escape(a.currency)}</small></span></label>`).join('')}</div>
+    </section>
     <section class="filters" aria-label="Filter">
-      <label>Marktplatz / Land<select id="account" aria-label="Marktplatz / Land"><option value="all">Alle Marktplätze · EUR</option><option value="amazon-all">Amazon · alle Länder · EUR</option>${data.accounts.map(a=>`<option value="${escape(a.id)}">${escape(a.name.replace(' · Demo',''))} · ${escape(a.currency)}</option>`).join('')}</select></label>
+
       <label>Anzeigewährung<select id="display-currency" aria-label="Anzeigewährung"><option value="eur">Euro (EUR)</option><option value="original">Originalwährung</option></select></label>
       <label>Zeitraum<select id="period" aria-label="Zeitraum"><option value="30">01.–30. September 2026</option><option value="7">24.–30. September 2026</option></select></label>
       <label>Marke<select id="brand" aria-label="Marke"><option value="all">Alle Marken</option>${data.catalog.brands.map(b => `<option value="${escape(b.id)}">${escape(b.name)}</option>`).join('')}</select></label>
@@ -77,15 +85,24 @@ function table(headers, rows, label) {
   return `<div class="table-scroll" tabindex="0" role="region" aria-label="${label}"><table><thead><tr>${headers.map(h => `<th scope="col">${h}</th>`).join('')}</tr></thead><tbody>${rows.join('')}</tbody></table></div>`;
 }
 function render() {
-  const accountId=document.querySelector('#account').value;
-  const accounts=data.accounts.filter(a=>accountId==='all'||accountId==='amazon-all'&&a.marketplace==='amazon'||a.id===accountId);
-  const accountIds=accounts.map(a=>a.id);
+  const accounts=data.accounts.filter(a=>selectedAccounts.has(a.id));
+  const accountIds=accounts.map(a=>a.id),accountId=accountIds[0];
+  document.querySelectorAll('[data-channel]').forEach(input=>{input.checked=selectedAccounts.has(input.dataset.channel);input.closest('label').classList.toggle('selected',input.checked);});
+  document.querySelector('#channel-selection-summary').textContent=`${accounts.length} von ${data.accounts.length} Kanälen ausgewählt`;
+  document.querySelector('#back-channels').hidden=!previousSelection;
   const selector=document.querySelector('#display-currency');
-  selector.querySelector('[value=original]').disabled=accounts.length>1;
-  selector.disabled=accounts.length>1;
-  if(accounts.length>1)selector.value='eur';
+  const mixedCurrencies=new Set(accounts.map(a=>a.currency)).size>1;
+  selector.querySelector('[value=original]').disabled=mixedCurrencies;
+  selector.disabled=mixedCurrencies;
+  if(mixedCurrencies)selector.value='eur';
   const eur=selector.value==='eur';
-  activeAccount=accounts.length===1?{...accounts[0],currency:eur?'EUR':accounts[0].currency}:{id:accountId,name:accountId==='all'?'Alle Marktplätze':'Amazon · alle Länder',currency:'EUR',marketplace:accountId==='all'?'mixed':'amazon'};
+  activeAccount=accounts.length===1?{...accounts[0],currency:eur?'EUR':accounts[0].currency}:{id:'selected',name:accounts.length?`${accounts.length} ausgewählte Kanäle`:'Keine Kanäle ausgewählt',currency:eur?'EUR':accounts[0]?.currency??'EUR',marketplace:accounts.length&&accounts.every(a=>a.marketplace==='amazon')?'amazon':'mixed'};
+  document.querySelectorAll('[data-view]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.view===view)));
+  if(!accounts.length){
+    document.querySelector('#active-channel').textContent='Keine Auswahl';document.querySelector('#channel-heading').textContent='Keine Kanäle ausgewählt';
+    document.querySelector('#coverage').textContent='';document.querySelector('#summary').innerHTML='';
+    document.querySelector('#content').innerHTML='<section class="empty" role="status"><h2>Wähle mindestens einen Marktplatz</h2><p>Die Kacheln lassen sich einzeln oder gemeinsam auswählen. Ohne Auswahl werden keine Gesamtwerte berechnet.</p></section>';return;
+  }
   document.querySelector('#active-channel').textContent=activeAccount.name.replace(' · Demo','');
   document.querySelector('#channel-heading').textContent=activeAccount.name.replace(' · Demo','');
   const isAmazon=activeAccount.marketplace==='amazon';
@@ -99,12 +116,13 @@ function render() {
   const categoryId = document.querySelector('#category').value;
   const selection = { brandId, categoryId, productId, query };
   const catalog = selectCatalog(data, selection);
-  const report = analytics(eur?eurData:data, { start, end: data.end, accountId, accountIds, ...selection });
-  const nativeReports=accounts.map(a=>analytics(data,{start,end:data.end,accountId:a.id,...selection}));
+  const appliedSelection=view==='overview'?{}:selection;
+  const report = analytics(eur?eurData:data, { start, end: data.end, accountId, accountIds, ...appliedSelection });
+  const nativeReports=accounts.map(a=>analytics(data,{start,end:data.end,accountId:a.id,...appliedSelection}));
   const originals=field=>nativeReports.map(r=>`${r.account.name.replace(' · Demo','')}: ${formatMoney(r.metrics[field],r.account.currency)}`).join(' · ');
   const nativeRows=new Map(nativeReports.flatMap(r=>r.rows.map(l=>[l.id,{...l,currency:r.account.currency}])));
   const originalRevenue=l=>formatMoney(nativeRows.get(l.id).metrics.revenue_cents,nativeRows.get(l.id).currency);
-  document.querySelector('#coverage').textContent = `${catalog.models.length} benannte Modelle in Auswahl · ${report.rows.length} Demo-Listings auf Basis bestätigter Farbvarianten. Weitere Modelle und offene Angaben findest du im Produktstamm.`;
+  document.querySelector('#coverage').textContent = view==='overview'?`Kontoblick · ${accounts.length} ausgewählte Kanäle · ${report.rows.length} Demo-Listings. Produktfilter wirken in den Detailauswertungen.`:`${catalog.models.length} benannte Modelle in Auswahl · ${report.rows.length} Demo-Listings auf Basis bestätigter Farbvarianten. Weitere Modelle und offene Angaben findest du im Produktstamm.`;
   const m = report.metrics;
   document.querySelector('#summary').innerHTML = `<section class="metrics" aria-label="Verkauf und Traffic">
     ${metric('Umsatz', money(m.revenue_cents,originals('revenue_cents')), 'Vor Erstattungen & Gebühren', 'revenue', true)}
@@ -115,14 +133,17 @@ function render() {
   document.querySelectorAll('[data-view]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.view === view)));
   let html = '';
   const head = (title, note) => `<div class="panel-heading"><h2>${title}</h2><span>${note}</span></div>`;
-  if (view === 'profit') { html=profitView({data,rows:report.rows,accountIds,start,end:data.end,eur,costState});
+  if(view==='overview'){ html=overviewView(blendedReport(data,{accountIds,start,end:data.end,eur}),{productFiltered:brandId!=='all'||categoryId!=='all'||productId!=='all'||!!query.trim()});
+  } else if (view === 'profit') { html=profitView({data,rows:report.rows,accountIds,start,end:data.end,eur,costState});
   } else if (view === 'sources') { html = accounts.map(a=>sourcesView(a,integrationData.results)).join('');
   } else if (view === 'sales') {
     html = `<section class="panel">${head('Listing-Performance', `${report.rows.length} Demo-Listings · Bewertungen nur mit geeigneter Quelle`)}${table(['Listing / externe ID', 'Bewertung', trafficLabel, conversionLabel, 'Sales · Einheiten', 'Umsatz'], report.rows.map(r => `<tr data-testid="listing-row"><td>${listingCell(r)}</td><td>${rating(r)}</td><td>${number(data.accounts.find(a=>a.id===r.account_id).marketplace==='amazon'?r.metrics.sessions:r.metrics.page_views)}</td><td>${percent(data.accounts.find(a=>a.id===r.account_id).marketplace==='amazon'?r.metrics.conversion:r.metrics.transactionViewRate)}</td><td>${number(r.metrics.units)}</td><td class="amount">${money(r.metrics.revenue_cents,originalRevenue(r))}<small class="subline">Ø Preis ${money(r.metrics.units?r.metrics.revenue_cents/r.metrics.units:null,formatMoney(nativeRows.get(r.id).metrics.units?nativeRows.get(r.id).metrics.revenue_cents/nativeRows.get(r.id).metrics.units:null,nativeRows.get(r.id).currency))}</small><details><summary>Originalbetrag</summary>${escape(originalRevenue(r))} · ${escape(nativeRows.get(r.id).currency)}</details></td></tr>`), 'Listing-Performance')}</section>`;
   } else if (view === 'refunds') {
     html = `<section class="metrics secondary">${metric('Erstattungsbetrag', money(m.refund_cents), 'Im gewählten Zeitraum', 'refund-amount')}${metric('Erstattete Einheiten', number(m.refunded_units), 'Nach Erstattungsdatum')}${metric('Erstattungsrate', percent(m.refundRate), 'Periodenquote, keine Bestellkohorte')}</section><section class="panel">${head('Erstattungen nach Listing', 'Erstattungsdatum · ohne Kohortenzuordnung')}${table(['Listing / ASIN', 'Sales · Einheiten', 'Erstattete Einheiten', 'Erstattungsbetrag', 'Erstattungsrate'], report.rows.map(r => `<tr><td>${listingCell(r)}</td><td>${number(r.metrics.units)}</td><td>${number(r.metrics.refunded_units)}</td><td>${money(r.metrics.refund_cents)}</td><td>${percent(r.metrics.refundRate)}</td></tr>`), 'Erstattungen')}</section>`;
   } else if (view === 'ads') {
-    html = `<section class="metrics secondary">${metric('Listing-zugeordnete Kosten', money(report.assignedSpend), 'Für die gefilterten Listings', 'assigned-spend')}${metric('Nicht zuordenbare Kosten', money(report.unassignedSpend), 'Gesamtes Konto · nur Zeitraumfilter', 'unassigned-spend')}${metric('Werbeausgaben · Konto gesamt', money(report.accountSpend), 'Alle Listings + nicht zuordenbar', 'account-spend')}</section>
+    const blended=blendedReport(data,{accountIds,start,end:data.end,eur});
+    report.accountSpend=blended.spend==null?null:Number(blended.spend)*100;
+    html = `${blended.spend==null?'<div class="notice">Werbedaten der Kanalauswahl sind unvollständig. Zugeordnete Kosten und Werbetypen zeigen nur vorliegende Werte; die Kontogesamtsumme bleibt offen.</div>':''}<section class="metrics secondary">${metric('Listing-zugeordnete Kosten', money(report.assignedSpend), 'Für die gefilterten Listings', 'assigned-spend')}${metric('Nicht zuordenbare Kosten', money(report.unassignedSpend), 'Gesamtes Konto · nur Zeitraumfilter', 'unassigned-spend')}${metric('Werbeausgaben · Konto gesamt', money(report.accountSpend), 'Alle Listings + nicht zuordenbar', 'account-spend')}</section>
       <section class="panel">${head('Werbeausgaben nach Werbetyp', 'Keine pauschale Verteilung auf Produkte')}${table(['Werbetyp', 'ASIN-zugeordnet · Auswahl', 'Nicht zuordenbar · Konto'], report.adBreakdown.map(a => `<tr><td>${a.name}</td><td>${money(a.assigned)}</td><td>${money(a.unassigned)}</td></tr>`), 'Werbetypen')}<p class="table-note">Streaming TV wird in dieser Demo nur auf Kontoebene berichtet. „—“ bedeutet: kein zugehöriger Datensatz vorhanden.</p></section>
       <section class="panel">${head('Werbekosten nach Listing', 'Nur Kosten mit eindeutigem Listing-Bezug')}${table(['Listing / ASIN', 'Sponsored Products', 'Sponsored Brands', 'Sponsored Display', 'Streaming TV', 'Sonstige', 'Gesamt'], report.rows.map(r => `<tr><td>${listingCell(r)}</td>${Object.keys(adTypes).map(type => `<td>${r.ads.some(a => a.ad_type === type) ? money(sumAds(r.ads.filter(a => a.ad_type === type))) : '—'}</td>`).join('')}<td>${r.ads.length ? money(sumAds(r.ads)) : '—'}</td></tr>`), 'Werbekosten nach Listing')}</section>
       <div class="notice"><strong>Nicht zuordenbar bleibt separat.</strong> In diesen Beispieldaten fehlt für einen Teil der Kampagnen der eindeutige ASIN-Bezug. Diese Kosten bleiben auch bei Produktauswahl sichtbar und werden keinem Produkt zugeschlagen.</div>`;
@@ -139,6 +160,7 @@ function render() {
   if (!report.rows.length && view !== 'catalog' && view !== 'sources') html = `<div class="empty" role="status"><h2>Keine Demo-Listings in dieser Auswahl</h2><p>${catalog.models.length || catalog.groups.length ? 'Das Sortiment ist vorgemerkt. Varianten und echte Marketplace-Zuordnungen sind noch offen; deshalb werden hier keine Kennzahlen erfunden.' : 'Suche oder Filter anpassen. Fehlende Daten sind keine Nullverkäufe.'}</p><button id="open-catalog">Produktstamm ansehen</button></div>` + (view === 'ads' ? html : '');
   if (view === 'catalog' && !catalog.models.length && !catalog.groups.length) html = '<div class="empty" role="status"><h2>Keine Modelle gefunden</h2><p>Suche oder Filter anpassen.</p></div>';
   document.querySelector('#content').innerHTML = html;
+  document.querySelectorAll('[data-drill-channel]').forEach(button=>button.addEventListener('click',()=>{previousSelection=[...selectedAccounts];selectedAccounts=new Set([button.dataset.drillChannel]);view='sales';render();}));
   if(view==='profit')bindProfit({data,rows:report.rows,costState,render});
   document.querySelector('#open-catalog')?.addEventListener('click', () => { view = 'catalog'; render(); });
   document.querySelectorAll('[data-listing]').forEach(b => b.addEventListener('click', () => {
@@ -147,10 +169,11 @@ function render() {
 }
 function showDetail(row) {
   const m = row.metrics;
+  const rowAccount=data.accounts.find(a=>a.id===row.account_id);
   const dialog = document.querySelector('#listing-dialog');
-  document.querySelector('#detail-content').innerHTML = `<div class="panel-heading"><div><p class="eyebrow">${escape(activeAccount.name.replace(' · Demo',''))} · ${escape(row.external_id)}</p><h2 id="detail-title">${escape(row.title)}</h2></div><button id="close-detail" aria-label="Details schließen">Schließen ×</button></div>
+  document.querySelector('#detail-content').innerHTML = `<div class="panel-heading"><div><p class="eyebrow">${escape(rowAccount.name.replace(' · Demo',''))} · ${escape(row.external_id)}</p><h2 id="detail-title">${escape(row.title)}</h2></div><button id="close-detail" aria-label="Details schließen">Schließen ×</button></div>
     <p class="table-note">Synthetisches Demo-Listing · echte SKU/ASIN-Zuordnung noch offen.<br>${escape(row.product.name)} · ${escape(row.product.internal_sku)}<br>${row.skus.map(s => escape(s.sku)).join(' · ')}</p>
-    <h3>Verkauf & Traffic</h3><section class="metrics">${metric('Umsatz', money(m.revenue_cents), 'Bestellumsatz')}${metric('Sales', number(m.units), 'Verkaufte Einheiten')}${metric(activeAccount.marketplace==='amazon'?'Sessions':'Pageviews', number(activeAccount.marketplace==='amazon'?m.sessions:m.page_views), 'Definition abhängig vom Kanal')}${metric('Conversion', percent(activeAccount.marketplace==='amazon'?m.conversion:m.transactionViewRate), activeAccount.marketplace==='amazon'?'Einheiten ÷ Sessions':'Transaktionen ÷ Pageviews')}</section>
+    <h3>Verkauf & Traffic</h3><section class="metrics">${metric('Umsatz', money(m.revenue_cents), 'Bestellumsatz')}${metric('Sales', number(m.units), 'Verkaufte Einheiten')}${metric(rowAccount.marketplace==='amazon'?'Sessions':'Pageviews', number(rowAccount.marketplace==='amazon'?m.sessions:m.page_views), 'Definition abhängig vom Kanal')}${metric('Conversion', percent(rowAccount.marketplace==='amazon'?m.conversion:m.transactionViewRate), rowAccount.marketplace==='amazon'?'Einheiten ÷ Sessions':'Transaktionen ÷ Pageviews')}</section>
     <h3>Bewertungen & Erstattungen</h3><p>Bewertung: ${rating(row)}</p><section class="metrics secondary">${metric('Erstattungsbetrag', money(m.refund_cents), 'Nach Erstattungsdatum')}${metric('Erstattete Einheiten', number(m.refunded_units), 'Im gewählten Zeitraum')}${metric('Erstattungsrate', percent(m.refundRate), 'Periodenquote')}</section>
     <h3>Werbeausgaben · nur diesem Listing zugeordnet</h3>${table(['Werbetyp', 'Ausgaben'], Object.entries(adTypes).map(([type,name]) => `<tr><td>${name}</td><td>${row.ads.some(a => a.ad_type === type) ? money(sumAds(row.ads.filter(a => a.ad_type === type))) : '—'}</td></tr>`), 'Listing-Werbung')}`;
   document.querySelector('#close-detail').addEventListener('click', () => dialog.close());
@@ -164,7 +187,7 @@ function updateModels() {
   if (models.some(m => m.id === current)) document.querySelector('#product').value = current;
 }
 for (const id of ['brand', 'category']) document.querySelector(`#${id}`).addEventListener('change', () => { updateModels(); render(); });
-for (const id of ['account', 'period', 'product','display-currency']) document.querySelector(`#${id}`).addEventListener('change', render);
+for (const id of ['period', 'product','display-currency']) document.querySelector(`#${id}`).addEventListener('change', render);
 document.querySelector('#search').addEventListener('input', render);
 document.querySelector('#reset').addEventListener('click', () => {
   document.querySelector('#period').value = '30';
@@ -175,6 +198,10 @@ document.querySelector('#reset').addEventListener('click', () => {
   document.querySelector('#search').value = '';
   render();
 });
-document.querySelector('#account').value=data.accountId;
+document.querySelectorAll('[data-channel]').forEach(input=>input.addEventListener('change',()=>{previousSelection=null;if(input.checked)selectedAccounts.add(input.dataset.channel);else selectedAccounts.delete(input.dataset.channel);render();}));
+document.querySelector('#select-all-channels').addEventListener('click',()=>{previousSelection=null;selectedAccounts=new Set(data.accounts.map(a=>a.id));render();});
+document.querySelector('#select-amazon-channels').addEventListener('click',()=>{previousSelection=null;selectedAccounts=new Set(data.accounts.filter(a=>a.marketplace==='amazon').map(a=>a.id));render();});
+document.querySelector('#clear-channels').addEventListener('click',()=>{previousSelection=null;selectedAccounts.clear();render();});
+document.querySelector('#back-channels').addEventListener('click',()=>{selectedAccounts=new Set(previousSelection??[]);previousSelection=null;view='overview';render();});
 updateModels();
 render();

@@ -256,3 +256,7 @@ Die Demo enthält zwölf Kanäle, 216 synthetische Listings, getrennte Währunge
 ## Ausbau Profit und EUR-Reporting
 
 Kostenhistorie, lokale private Kostenverwaltung, Abrechnungsdetails und eine mit dem Browser geteilte Deckungsbeitragsrechnung sind umgesetzt. Die Demo bietet SKU-Kostenpflege, Marge, Kostenabdeckung und Multi-Konto-EUR-Reporting mit synthetischen Tageskursen. [Profit-Vertrag](PROFIT.md). Reale Kosten-/Steuerzuordnung, FX-Quelle, allgemeine Betriebskosten sowie privates Hosting/Login bleiben offen; die öffentliche Demo speichert Kostenänderungen nur im jeweiligen Browser.
+
+## Freie Kanalauswahl und Gesamtüberblick
+
+Checkbox-Kacheln ersetzen den festen Kanal-Dropdown. Die Gesamtübersicht vergleicht beliebige Kontokombinationen mit automatischem EUR-Zwang bei Mischwährungen und expliziter Kosten-/Attributionsabdeckung. MER, Ads-ROAS, ACoS und TACoS verwenden Summenquotienten. Drilldown und Rücksprung zur Auswahl sind umgesetzt. [Kennzahlenvertrag](../marketing/README.md). Die Daten sind synthetisch; tatsächliche Ads-Verfügbarkeit und kompatible Attribution bleiben je Quelle zu prüfen.
