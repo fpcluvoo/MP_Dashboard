@@ -1,4 +1,6 @@
 import './style.css';
+import './workspace.css';
+import {homeView,primaryNavigation,prepareMobileTables} from './workspace.js';
 import {pages,pageFromHash,navigationMarkup,bindNavigation} from './navigation.js';
 import dataUrl from './data/demo.generated.json?url';
 let data;
@@ -12,7 +14,7 @@ try {
 }
 import {analyze,datesBetween} from '../bi/model.js';
 import {validateView,productCsv} from '../bi/reporting.js';
-import {comparisonView,trendView,insightsView,productsView,bridgeView,qualityView,productDetail,bindIntelligence} from './intelligence.js';
+import {comparisonView,productsView,bridgeView,qualityView,productDetail,bindIntelligence} from './intelligence.js';
 import {blendedReport} from '../marketing/calculate.js';
 import {overviewView} from './overview.js';
 import {euroData} from '../profit/fx.js';
@@ -48,7 +50,8 @@ const rating = row => row.rating?.rating == null ? '<span class="muted">Nicht ve
 document.querySelector('#app').innerHTML = `
   ${navigationMarkup()}
   <main id="overview">
-    <header class="app-header"><button id="menu-toggle" aria-label="Menü öffnen" aria-controls="app-menu" aria-expanded="false"><span aria-hidden="true">☰</span> Menü</button><a class="brand home-link" href="#/overview"><span class="logo">mp</span> Marketplace BI</a><span class="demo">● Demo-Modus</span></header>
+    <header class="app-header"><button id="menu-toggle" aria-label="Menü öffnen" aria-controls="app-menu" aria-expanded="false"><span aria-hidden="true">☰</span> Menü</button><a class="brand home-link" href="#/overview"><span class="brand-name">CLOUVOU</span><span class="brand-product">Business Intelligence</span></a><span class="demo">● Demo-Modus</span></header>
+    ${primaryNavigation()}
     <section class="heading"><div><p class="eyebrow" id="page-group"></p><h1 id="page-title" tabindex="-1"></h1><p id="page-description"></p></div></section>
     <p class="demo-context">Synthetische Beispieldaten · August / September 2026 · simulierte EUR-Kurse</p>
     <section class="brand-overview" aria-label="Markenübersicht">${data.catalog.brands.map(b => {
@@ -59,7 +62,9 @@ document.querySelector('#app').innerHTML = `
       <div class="channel-actions"><button id="select-all-channels">Alle auswählen</button><button id="select-amazon-channels">Nur Amazon</button><button id="clear-channels">Auswahl leeren</button><button id="back-channels" hidden>Zur Kanalauswahl zurück</button></div>
       <div class="channel-tiles" role="group" aria-label="Marktplatz-Mehrfachauswahl">${data.accounts.map(a=>`<label class="channel-choice"><input type="checkbox" data-channel="${escape(a.id)}" aria-label="${escape(a.name.replace(' · Demo',''))}" ${a.id===data.accountId?'checked':''}><span><strong>${escape(a.name.replace(' · Demo',''))}</strong><small>${escape(a.currency)}</small></span></label>`).join('')}</div>
     </details>
-    <section class="filters" aria-label="Filter">
+    <div class="quick-controls"><div class="quick-periods" role="group" aria-label="Zeitraum schnell wählen"><button data-period="7">7 Tage</button><button data-period="14">14 Tage</button><button data-period="30">September</button><button data-period="custom">Eigener Zeitraum</button></div><button id="toggle-filters" aria-expanded="false" aria-controls="analysis-filters">Filter & Vergleich</button></div>
+    <div id="search-slot"></div>
+    <section class="filters" id="analysis-filters" aria-label="Filter">
 
       <label>Anzeigewährung<select id="display-currency" aria-label="Anzeigewährung"><option value="eur">Euro (EUR)</option><option value="original">Originalwährung</option></select></label>
       <label>Zeitraum<select id="period" aria-label="Zeitraum"><option value="30">01.–30. September 2026</option><option value="7">24.–30. September 2026</option><option value="14">17.–30. September 2026</option><option value="custom">Eigener Zeitraum</option></select></label><label class="custom-range" hidden>Von<input id="range-start" type="date" aria-label="Zeitraum von" min="2026-08-01" max="2026-09-30" value="2026-09-01"></label><label class="custom-range" hidden>Bis<input id="range-end" type="date" aria-label="Zeitraum bis" min="2026-08-01" max="2026-09-30" value="2026-09-30"></label><label>Vergleich<select id="compare" aria-label="Periodenvergleich"><option value="previous">Gleich lange Vorperiode</option><option value="off">Ohne Vergleich</option></select></label>
@@ -69,13 +74,15 @@ document.querySelector('#app').innerHTML = `
       <label class="search-label">Listing suchen<input id="search" type="search" placeholder="ASIN, SKU oder Produktname" aria-label="Listing suchen"></label>
       <button id="reset">Zurücksetzen</button>
     </section>
-    <details id="report-tools" class="report-tools"><summary>Ansichten & Export</summary><section class="report-toolbar" aria-label="Reports verwalten"><div><label>Ansicht benennen<input id="view-name" aria-label="Ansicht benennen" maxlength="50" placeholder="z. B. Amazon Wochenreport"></label><button id="save-view">Ansicht speichern</button></div><div><label>Gespeicherte Ansichten<select id="saved-view" aria-label="Gespeicherte Ansichten"><option value="">Ansicht wählen</option></select></label><button id="load-view">Laden</button><button id="delete-view">Löschen</button></div><div><button id="export-products">Produktreport CSV</button><button id="print-report">Drucken / PDF</button></div></section>
-    <p id="report-status" role="status" class="report-status"></p></details><p id="report-meta" class="print-meta"></p>
-    <p class="fx-note">EUR-Umrechnung mit synthetischen Demo-Tageskursen. Keine echten Marktkurse. Originalbeträge per Hover oder unter „Originalbeträge & Wechselkurse“.</p>
+
     <p id="coverage" class="coverage" aria-live="polite"></p>
     <div id="summary" aria-live="polite"></div>
 
-    <div id="content"></div>
+    <div id="content"></div><div id="original-values"></div>
+    <details id="report-tools" class="report-tools"><summary>Ansichten & Export</summary><section class="report-toolbar" aria-label="Reports verwalten"><div><label>Ansicht benennen<input id="view-name" aria-label="Ansicht benennen" maxlength="50" placeholder="z. B. Amazon Wochenreport"></label><button id="save-view">Ansicht speichern</button></div><div><label>Gespeicherte Ansichten<select id="saved-view" aria-label="Gespeicherte Ansichten"><option value="">Ansicht wählen</option></select></label><button id="load-view">Laden</button><button id="delete-view">Löschen</button></div><div><button id="export-products">Produktreport CSV</button><button id="print-report">Drucken / PDF</button></div></section>
+    <p id="report-status" role="status" class="report-status"></p></details><p id="report-meta" class="print-meta"></p>
+
+    <p class="fx-note">Demo-Tageskurse · Originalbeträge in den Details · keine Live-Daten</p>
     <details class="definitions"><summary>So werden die Kennzahlen berechnet</summary><dl>
       <dt>Umsatz & Sales</dt><dd>Bestellumsatz vor Erstattungen, Werbekosten und Gebühren. Sales = verkaufte Einheiten, nicht Anzahl Bestellungen. Keine Gewinnkennzahl.</dd>
       <dt>Sessions & Conversion Rate</dt><dd>Sessions auf Child-ASIN-Ebene. Conversion Rate = verkaufte Einheiten ÷ Sessions (Amazon Unit Session Percentage). Summenquotient über den Zeitraum, kein Mittelwert der Tagesraten. Über mehrere ASINs sind Sessions nicht besucherübergreifend dedupliziert.</dd>
@@ -113,14 +120,18 @@ function pageLayout(){
  for(const id of ['brand','category','product','search'])document.querySelector(`#${id}`).closest('label').hidden=accountScope||view==='sources';
  document.querySelector('#reset').hidden=accountScope;
  document.querySelector('#report-tools').hidden=admin;
- document.querySelector('#summary').hidden=admin||['quality','profit'].includes(view);
+ document.querySelector('#summary').hidden=admin||['quality','profit','overview'].includes(view);
  document.querySelector('#coverage').hidden=!['catalog','sales','products'].includes(view);
- document.querySelector('.fx-note').hidden=admin;
+ document.querySelector('.fx-note').hidden=admin;document.querySelector('#original-values').hidden=admin||['quality','profit'].includes(view);
  document.querySelector('.definitions').hidden=admin;
+ document.querySelector('.quick-controls').hidden=admin;
+ document.querySelector('#search-slot').hidden=accountScope||['sources','costs'].includes(view);
+ document.querySelectorAll('[data-period]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.period===document.querySelector('#period').value)));
+ document.querySelectorAll('[data-primary-page]').forEach(b=>{if(b.dataset.primaryPage===view)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
  document.querySelectorAll('[data-view]').forEach(b=>{b.setAttribute('aria-pressed',String(b.dataset.view===view));if(b.dataset.view===view)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
 }
 function render() {
-  pageLayout();
+  pageLayout();document.querySelector('#original-values').replaceChildren();
   const accounts=data.accounts.filter(a=>selectedAccounts.has(a.id)||(view==='catalog'&&!selectedAccounts.size&&a.id===data.accountId));
   const accountIds=accounts.map(a=>a.id),accountId=accountIds[0];
   document.querySelectorAll('[data-channel]').forEach(input=>{input.checked=selectedAccounts.has(input.dataset.channel);input.closest('label').classList.toggle('selected',input.checked);});
@@ -174,11 +185,13 @@ function render() {
     ${metric(trafficLabel, number(isAmazon?m.sessions:m.page_views), isAmazon?'Summe der Listing-Sessions':'Kein Ersatz für Amazon-Sessions', 'sessions')}
     ${metric(conversionLabel, percent(isAmazon?m.conversion:m.transactionViewRate), isAmazon?'Einheiten ÷ Sessions':isEbay?'Transaktionen ÷ Pageviews':'Keine bestätigte Traffic-Quelle', 'conversion')}
   </section><details class="originals"><summary>Originalbeträge & Wechselkurse</summary><p>Bestellumsatz: ${escape(originals('revenue_cents'))}</p><p>Erstattungen: ${escape(originals('refund_cents'))}</p><p>Jeder Tagesbetrag wird mit seinem Tageskurs in EUR umgerechnet. Beispielkurse am ${end}: ${data.fx.filter(r=>r.date===end&&accounts.some(a=>a.currency===r.currency)).map(r=>`1 ${r.currency} = ${r.rate} EUR`).join(' · ')||'EUR unverändert'}. Quelle: synthetische Demodaten.</p></details>`;
+  document.querySelector('#original-values').replaceChildren(document.querySelector('#summary .originals'));
+  if(view==='products')document.querySelector('#coverage').textContent=`${bi.products.length} Modelle · ${report.rows.length} Listings · Produkt antippen für Details`;
   document.querySelector('#summary .metrics').hidden=!['sales','refunds','ads'].includes(view);
   document.querySelectorAll('[data-view]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.view === view)));
   let html = '';
   const head = (title, note) => `<div class="panel-heading"><h2>${title}</h2><span>${note}</span></div>`;
-  if(view==='overview'){ html=comparisonView(bi,activeAccount.currency)+trendView(bi,activeAccount.currency,trendMetric)+insightsView(bi);
+  if(view==='overview'){ html=homeView(bi,activeAccount.currency,trendMetric);
   } else if(view==='markets'){html=overviewView(bi.marketing,{productFiltered:brandId!=='all'||categoryId!=='all'||productId!=='all'||!!query.trim()});
   } else if(view==='products'){html=comparisonView(bi,activeAccount.currency)+productsView(bi,activeAccount.currency,productSort)+bridgeView(bi,activeAccount.currency);
   } else if(view==='quality'){html=qualityView(bi,data);
@@ -209,6 +222,8 @@ function render() {
   if (!report.rows.length && !['catalog','sources','quality'].includes(view)) html = `<div class="empty" role="status"><h2>Keine Demo-Listings in dieser Auswahl</h2><p>${catalog.models.length || catalog.groups.length ? 'Das Sortiment ist vorgemerkt. Varianten und echte Marketplace-Zuordnungen sind noch offen; deshalb werden hier keine Kennzahlen erfunden.' : 'Suche oder Filter anpassen. Fehlende Daten sind keine Nullverkäufe.'}</p><button id="open-catalog">Produktstamm ansehen</button></div>` + (view === 'ads' ? html : '');
   if (view === 'catalog' && !catalog.models.length && !catalog.groups.length) html = '<div class="empty" role="status"><h2>Keine Modelle gefunden</h2><p>Suche oder Filter anpassen.</p></div>';
   document.querySelector('#content').innerHTML = html;
+  prepareMobileTables();
+  document.querySelectorAll('[data-home-page]').forEach(b=>b.addEventListener('click',()=>{document.querySelector('#brand').value='all';document.querySelector('#category').value='all';document.querySelector('#search').value='';updateModels();document.querySelector('#product').value='all';navigate(b.dataset.homePage);}));
   document.querySelectorAll('[data-drill-channel]').forEach(button=>button.addEventListener('click',()=>{previousSelection=[...selectedAccounts];selectedAccounts=new Set([button.dataset.drillChannel]);navigate('sales');}));
   bindIntelligence(bi,activeAccount.currency,{trendMetric,onTrend:value=>{trendMetric=value;render();},onSort:value=>{productSort=value;render();},onProduct:id=>showProduct(bi.products.find(p=>p.id===id)),onJump:id=>navigate(id)});
   if(view==='costs')bindProfit({data,rows:report.rows,costState,render});
@@ -228,8 +243,13 @@ function showDetail(row) {
     <h3>Bewertungen & Erstattungen</h3><p>Bewertung: ${rating(row)}</p><section class="metrics secondary">${metric('Erstattungsbetrag', money(m.refund_cents), 'Nach Erstattungsdatum')}${metric('Erstattete Einheiten', number(m.refunded_units), 'Im gewählten Zeitraum')}${metric('Erstattungsrate', percent(m.refundRate), 'Periodenquote')}</section>
     <h3>Werbeausgaben · nur diesem Listing zugeordnet</h3>${table(['Werbetyp', 'Ausgaben'], Object.entries(adTypes).map(([type,name]) => `<tr><td>${name}</td><td>${row.ads.some(a => a.ad_type === type) ? money(sumAds(row.ads.filter(a => a.ad_type === type))) : '—'}</td></tr>`), 'Listing-Werbung')}`;
   document.querySelector('#close-detail').addEventListener('click', () => dialog.close());
-  dialog.showModal();
+  prepareMobileTables(dialog);dialog.showModal();
 }
+document.querySelector('#search-slot').append(document.querySelector('.search-label'));
+function expandFilters(){document.querySelector('#analysis-filters').classList.add('filters-open');document.querySelector('#toggle-filters').setAttribute('aria-expanded','true');}
+document.querySelector('#toggle-filters').addEventListener('click',()=>{const open=document.querySelector('#analysis-filters').classList.toggle('filters-open');document.querySelector('#toggle-filters').setAttribute('aria-expanded',String(open));});
+document.querySelectorAll('[data-period]').forEach(b=>b.addEventListener('click',()=>{document.querySelector('#period').value=b.dataset.period;if(b.dataset.period==='custom')expandFilters();render();}));
+document.querySelectorAll('[data-primary-page]').forEach(b=>b.addEventListener('click',()=>navigate(b.dataset.primaryPage)));
 bindNavigation(navigate);
 document.querySelector('.home-link').addEventListener('click',e=>{e.preventDefault();navigate('overview');});
 function updateModels() {
@@ -262,7 +282,7 @@ render();
 function showProduct(product){
  if(!product)return;const dialog=document.querySelector('#listing-dialog');document.querySelector('#detail-content').innerHTML=productDetail(product,activeAccount.currency,data);
  document.querySelector('#close-detail').addEventListener('click',()=>dialog.close());
- document.querySelector('#product-to-listings').addEventListener('click',()=>{dialog.close();document.querySelector('#brand').value='all';document.querySelector('#category').value='all';document.querySelector('#search').value='';updateModels();document.querySelector('#product').value=product.id;navigate('sales');});dialog.showModal();
+ document.querySelector('#product-to-listings').addEventListener('click',()=>{dialog.close();document.querySelector('#brand').value='all';document.querySelector('#category').value='all';document.querySelector('#search').value='';updateModels();document.querySelector('#product').value=product.id;navigate('sales');});prepareMobileTables(dialog);dialog.showModal();
 }
 function refreshSavedViews(){document.querySelector('#saved-view').innerHTML='<option value="">Ansicht wählen</option>'+savedViews.map(v=>`<option value="${escape(v.id)}">${escape(v.name)}</option>`).join('');}
 function reportStatus(text){document.querySelector('#report-status').textContent=text;}

@@ -1,5 +1,7 @@
 # BI-Arbeitsbereich · Demo-Ausbau 04.10.2026
 
+Die mobile UX wurde anschließend um einen direkten Einstieg über KPIs, Produktkarten und feste Schnellnavigation ergänzt. Siehe [mobile Bedienwege](MOBILE_UX.md).
+
 ## Seiten und Navigation
 
 Das Burger-Menü in der Kopfzeile öffnet zwei Gruppen: **Analyse** mit Gesamtüberblick, Marktplätzen, Produkten, Verkauf/Traffic, Werbung, Erstattungen und Profit/Marge; **Verwaltung** mit Kostenpflege, Produktstamm, Datenqualität und Datenquellen/APIs. Es gibt keine zusätzliche Reiterleiste. Das Menü unterstützt Tastatur und Escape; nach Seitenwechsel steht der Fokus auf der Überschrift.

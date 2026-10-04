@@ -1,5 +1,7 @@
 # Sellerboard: zugängliche Hinweise und Claim-Abgleich
 
+Aktualisierung 04.10.2026: Die offizielle Startseite und drei dort eingebettete UI-Illustrationen konnten inzwischen abgerufen und visuell geprüft werden. Quellen und daraus abgeleitete UX-Entscheidungen stehen in [MOBILE_UX.md](MOBILE_UX.md). Die folgenden Abschnitte dokumentieren den früheren Stand.
+
 Recherche: 02.10.2026. Die direkte Herstellerseite bleibt über die aktuelle Cloud-Netzwerkregel nicht erreichbar. Deshalb wurde ergänzend auf öffentlich zugänglichem GitHub nach unabhängigen Erwähnungen gesucht. Es wurden weder private Sellerboard-Konten verwendet noch eingeschränkte Seiten über einen Umgehungsproxy geladen.
 
 ## Quellen und Aussagekraft

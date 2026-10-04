@@ -6,6 +6,8 @@ Dashboard für neun Amazon-Länder sowie eBay, OTTO und Kaufland auf Listing-Ebe
 
 ## Funktionsumfang
 
+- **Mobiler Einstieg:** antippbare KPI-Karten, direkte Produktdrilldowns, feste Schnellnavigation, Zeitraum-Schaltflächen und gestapelte Datensätze statt breiter Tabellen. [Bedienwege, Referenzen und offener Markenabgleich](docs/MOBILE_UX.md).
+
 - **Seitennavigation:** Burger-Menü mit Analyse und Verwaltung. Jede Seite hat eine direkte Adresse und unterstützt Neuladen sowie Browser-Zurück/Vorwärts. Kostenpflege, Profit und Marktplatzvergleich sind getrennte Seiten; Kanalauswahl und Reportaktionen sind aufklappbar.
 
 - **BI-Arbeitsbereich:** frei wählbare Zeiträume, gleich lange Vorperioden, Tagestrends, kanalübergreifende Produktanalyse, regelbasierte Hinweise und Datenqualität. Lokal gespeicherte Ansichten, CSV-Reports und Druck-/PDF-Ansicht. [Bedienung und Rechenregeln](docs/BI_WORKSPACE.md).

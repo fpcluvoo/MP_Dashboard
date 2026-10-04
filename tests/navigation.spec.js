@@ -1,5 +1,5 @@
 import {test,expect} from '@playwright/test';
-import {go,channels} from './ui-helpers.js';
+import {go,channels,period} from './ui-helpers.js';
 
 test('drawer supports keyboard, focus, direct page links, reload and browser history',async({page})=>{
  const errors=[];page.on('pageerror',e=>errors.push(e.message));await page.goto('/');
@@ -19,7 +19,7 @@ test('cost page retains the edited SKU, updates separate profit page and remains
  await page.setViewportSize({width:390,height:844});await page.goto('/#/costs');
  await page.getByLabel('Kosten-SKU').selectOption('1');await page.getByLabel('Kosten Einkauf',{exact:true}).fill('99');await page.getByRole('button',{name:'Kostenversion speichern',exact:true}).click();await expect(page.getByLabel('Kosten-SKU')).toHaveValue('1');await expect(page.getByLabel('Kosten Einkauf',{exact:true})).toHaveValue('99.000000');
  await go(page,'Profit & Marge');const changed=await page.getByTestId('profit-value').innerText();await go(page,'Kostenpflege');await expect(page.getByLabel('Kosten-SKU')).toHaveValue('1');await page.getByRole('button',{name:'Demo-Kosten zurücksetzen'}).click();await go(page,'Profit & Marge');await expect(page.getByTestId('profit-value')).not.toHaveText(changed);
- await page.getByLabel('Zeitraum',{exact:true}).selectOption('custom');await page.getByLabel('Zeitraum von',{exact:true}).fill('2026-09-30');await page.getByLabel('Zeitraum bis',{exact:true}).fill('2026-09-01');await expect(page.locator('#content')).toContainText('Zeitraum muss');
+ await period(page,'custom');await page.getByLabel('Zeitraum von',{exact:true}).fill('2026-09-30');await page.getByLabel('Zeitraum bis',{exact:true}).fill('2026-09-01');await expect(page.locator('#content')).toContainText('Zeitraum muss');
  await go(page,'Kostenpflege');await expect(page.locator('#cost-form')).toBeVisible();expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
  await channels(page);await page.getByRole('button',{name:'Auswahl leeren',exact:true}).click();await go(page,'Produktstamm');await expect(page.getByTestId('catalog-row')).toHaveCount(15);
 });
