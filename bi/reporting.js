@@ -1,5 +1,5 @@
 import {datesBetween} from './model.js';
-export const reportViews=['overview','products','sales','refunds','ads','catalog','profit','quality','sources'];
+export const reportViews=['overview','markets','costs','products','sales','refunds','ads','catalog','profit','quality','sources'];
 export function validateView(state,data) {
  if(!state||state.version!==1||!Array.isArray(state.accountIds)||!state.accountIds.length||new Set(state.accountIds).size!==state.accountIds.length||state.accountIds.some(id=>!data.accounts.some(a=>a.id===id)))throw new Error('Ungültige Kanalauswahl');
  datesBetween(state.start,state.end);if(state.start<data.historyStart||state.end>data.end)throw new Error('Zeitraum außerhalb der Demo');

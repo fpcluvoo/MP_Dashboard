@@ -18,6 +18,8 @@ Tatsächliche Fulfillment-Kosten ersetzen den manuellen SKU-Satz, auch wenn sie 
 
 ## SKU-Kostenpflege
 
+Im Burger-Menü unter **Verwaltung → Kostenpflege** (`#/costs`). Eingabe und Historie stehen getrennt von **Analyse → Profit & Marge** (`#/profit`). Die gewählte SKU bleibt nach dem Speichern und beim Seitenwechsel erhalten; der Profit wird mit den gespeicherten Kosten neu berechnet.
+
 Schlüssel: Konto + Seller-SKU + Währung + Gültigkeitszeitraum. Alle sechs Kategorien sind **netto je verkaufter Einheit**. Fixkosten pro Bestellung/Paket gehören als tatsächlicher Positions-/Bestellbetrag in die geprüften Abrechnungsdaten, nicht unbemerkt in einen Stückkostensatz. Bereits im Einkauf enthaltene Fracht/Zoll bzw. in Fulfillment enthaltene Verpackung nicht erneut hinterlegen.
 
 Neue Versionen schließen den vorherigen offenen Zeitraum. Rückwirkende Überschneidungen werden zurückgewiesen. Die SQLite-Backendklasse `backend/cost-store.js` speichert Revisionen und Auditstände mit Bearbeiter/Zeitpunkt und schützt vor konkurrierenden Änderungen über `expectedRevision`. Die öffentliche Demo nutzt denselben Kostenvertrag, speichert Änderungen jedoch nur im Browserspeicher. Sie schreibt nichts in den privaten Backend-Speicher und synchronisiert nicht zwischen Geräten.

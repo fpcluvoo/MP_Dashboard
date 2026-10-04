@@ -1,13 +1,21 @@
 # BI-Arbeitsbereich · Demo-Ausbau 04.10.2026
 
+## Seiten und Navigation
+
+Das Burger-Menü in der Kopfzeile öffnet zwei Gruppen: **Analyse** mit Gesamtüberblick, Marktplätzen, Produkten, Verkauf/Traffic, Werbung, Erstattungen und Profit/Marge; **Verwaltung** mit Kostenpflege, Produktstamm, Datenqualität und Datenquellen/APIs. Es gibt keine zusätzliche Reiterleiste. Das Menü unterstützt Tastatur und Escape; nach Seitenwechsel steht der Fokus auf der Überschrift.
+
+Jeder Bereich hat eine eigene Hash-Adresse, z. B. `#/costs`, `#/profit` oder `#/markets`. Diese funktioniert auf GitHub Pages auch nach Neuladen und mit Browser-Zurück/Vorwärts. Der Link identifiziert die Seite; Filter werden nicht in der URL übertragen. Beim Navigieren bleiben ausgewählte Filter im laufenden Browser erhalten, für Wiederverwendung nach Neuladen dienen gespeicherte Ansichten.
+
+Die Kanal-Kacheln öffnen sich über **Marktplätze auswählen**. **Ansichten & Export** bündelt die seltener benötigten Reportaktionen. Zeitraum, Währung und Vergleich werden nur in passenden Auswertungen angezeigt. Kostenpflege enthält ausschließlich die Konto-/SKU-Auswahl, Kosteneingabe und Historie; versteckte Produkt- oder Zeitraumfilter begrenzen sie nicht. Produktstamm funktioniert auch bei leerer Kanalauswahl.
+
 ## Bedienung
 
 1. Kanäle über die Kacheln auswählen. Verschiedene Währungen erzwingen EUR; Originalbeträge bleiben in der Umsatzanzeige und den Kanal-/Listingdetails einsehbar.
 2. September, 7/14 Tage oder einen eigenen Zeitraum zwischen 01.08. und 30.09.2026 auswählen. Der Vergleich verwendet unmittelbar davor liegende, gleich viele Kalendertage. Beispiel: September 01.–30. gegen August 02.–31., nicht automatisch den vollen Vormonat.
-3. **Gesamtüberblick** zeigt Kontosummen, Veränderungen, tägliche Umsatz-/Einheiten-/DB-Verläufe, regelbasierte Hinweise sowie den bestehenden Werbe- und Kanalvergleich. Produktfilter wirken hier ausdrücklich nicht. Chartpunkte sind per Maus, Touch oder Tastatur bedienbar; alle Tageswerte stehen auch als Tabelle bereit.
+3. **Gesamtüberblick** zeigt Kontosummen, Veränderungen, tägliche Umsatz-/Einheiten-/DB-Verläufe, regelbasierte Hinweise. Der Werbe- und Kanalvergleich liegt auf der eigenen Seite **Marktplätze**. Produktfilter wirken hier ausdrücklich nicht. Chartpunkte sind per Maus, Touch oder Tastatur bedienbar; alle Tageswerte stehen auch als Tabelle bereit.
 4. **Produktanalyse** führt Listings über interne Modell-IDs zusammen. Sortierung nach Umsatz, DB, Wachstum oder Erstattungsquote; Details zeigen Varianten, Kanäle und zugeordnete SKUs. Der Sprung in Listings behält Kanäle und Zeitraum bei und wählt das untersuchte Modell.
 5. **Datenqualität** zeigt Umsatz- und Profitabdeckung auf Listingebene sowie Werbekosten-/Attributionsabdeckung auf Kanalebene. Das sind Prüfungen der synthetischen Daten, keine Live-Importbestätigung.
-6. **Ansicht speichern** speichert bis zu 20 benannte Kanal-, Zeit-, Produkt-, Währungs- und Vergleichseinstellungen samt Bereich lokal im Browser. Laden und Löschen sind verfügbar. Keine geräteübergreifende Synchronisation; die eigentlichen Kennzahlen werden beim Laden neu berechnet.
+6. Unter **Ansichten & Export → Ansicht speichern** werden bis zu 20 benannte Kanal-, Zeit-, Produkt-, Währungs- und Vergleichseinstellungen samt Bereich lokal im Browser gespeichert. Laden und Löschen sind verfügbar. Keine geräteübergreifende Synchronisation; die eigentlichen Kennzahlen werden beim Laden neu berechnet.
 7. **Produktreport CSV** exportiert die aktuelle Produktauswertung mit Zeitraum, Kanälen, Währung, Vorperiodenwerten und Demo-/FX-Herkunft. Im Gesamtüberblick umfasst sie die gesamten ausgewählten Konten. UTF-8-BOM, Semikolon, deutsche Dezimalzahlen; fehlende Werte bleiben leer. Textfelder werden gegen Spreadsheet-Formelinjektion abgesichert. **Drucken / PDF** öffnet den Browserdruckdialog mit einem Layout ohne Bedienleisten.
 
 ## Berechnungen und Grenzen

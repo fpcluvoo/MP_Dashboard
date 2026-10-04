@@ -6,6 +6,8 @@ Dashboard für neun Amazon-Länder sowie eBay, OTTO und Kaufland auf Listing-Ebe
 
 ## Funktionsumfang
 
+- **Seitennavigation:** Burger-Menü mit Analyse und Verwaltung. Jede Seite hat eine direkte Adresse und unterstützt Neuladen sowie Browser-Zurück/Vorwärts. Kostenpflege, Profit und Marktplatzvergleich sind getrennte Seiten; Kanalauswahl und Reportaktionen sind aufklappbar.
+
 - **BI-Arbeitsbereich:** frei wählbare Zeiträume, gleich lange Vorperioden, Tagestrends, kanalübergreifende Produktanalyse, regelbasierte Hinweise und Datenqualität. Lokal gespeicherte Ansichten, CSV-Reports und Druck-/PDF-Ansicht. [Bedienung und Rechenregeln](docs/BI_WORKSPACE.md).
 
 - **Verkauf & Traffic:** Bestellumsatz, verkaufte Einheiten (Sales), Sessions, Conversion Rate und letzter Bewertungsstand inklusive Anzahl und Datum je ASIN.
@@ -20,13 +22,13 @@ Neun getrennte Amazon-Kanäle: DE, FR, IT, ES, NL, BE, PL, GB und US. eBay/Kaufl
 
 ## Profit und Euro-Reporting
 
-**Profit & Kosten** zeigt Deckungsbeitrag und Marge mit Kostenabdeckung. SKU-Kosten sind in der Demo mit Gültigkeitsdatum bearbeitbar; das private Backend besitzt Kostenhistorie und Auditprotokoll. Gebührenbelege aus Amazon/eBay, OTTO-Belegdetails und Kaufland-Buchungsreports sind vorbereitet. [Definitionen, Abrechnungsquellen und Bedienung](docs/PROFIT.md).
+**Profit & Marge** zeigt Deckungsbeitrag und Marge mit Kostenabdeckung. Die separate Seite **Kostenpflege** macht SKU-Kosten in der Demo mit Gültigkeitsdatum bearbeitbar; das private Backend besitzt Kostenhistorie und Auditprotokoll. Gebührenbelege aus Amazon/eBay, OTTO-Belegdetails und Kaufland-Buchungsreports sind vorbereitet. [Definitionen, Abrechnungsquellen und Bedienung](docs/PROFIT.md).
 
 Freie Kanal-Mehrfachauswahl über Kacheln, mit Schnellaktionen für alle Kanäle oder nur Amazon; Euro-Anzeige mit synthetischen Tageskursen und einsehbaren Originalbeträgen. Für echte historische Kurse und reale Kosten ist noch Quellenabgleich erforderlich.
 
 ## Gesamtüberblick und Werbung
 
-Der Standardreiter **Gesamtüberblick** zeigt MER/Blended ROAS, aggregierten ACoS, TACoS und attribuierten Ads-ROAS für die gewählten Kanäle. Datenabdeckung und Originalbeträge sind sichtbar; der Kanalvergleich führt direkt in Listings und zurück zur vorherigen Auswahl. Produktfilter gelten für die Detailbereiche. [Kennzahlenvertrag und Grenzen](marketing/README.md).
+Die Seite **Marktplätze** zeigt MER/Blended ROAS, aggregierten ACoS, TACoS und attribuierten Ads-ROAS für die gewählten Kanäle. Datenabdeckung und Originalbeträge sind sichtbar; der Kanalvergleich führt direkt in Listings und zurück zur vorherigen Auswahl. Produktfilter gelten für die Detailbereiche. [Kennzahlenvertrag und Grenzen](marketing/README.md).
 
 ## Entwicklung
 
