@@ -9,6 +9,9 @@ try {
   document.querySelector('#app').innerHTML = '<main class="load-error"><h1>Demodaten konnten nicht geladen werden</h1><p>Bitte lade die Seite erneut.</p></main>';
   throw error;
 }
+import {analyze,datesBetween} from '../bi/model.js';
+import {validateView,productCsv} from '../bi/reporting.js';
+import {comparisonView,trendView,insightsView,productsView,bridgeView,qualityView,productDetail,bindIntelligence} from './intelligence.js';
 import {blendedReport} from '../marketing/calculate.js';
 import {overviewView} from './overview.js';
 import {euroData} from '../profit/fx.js';
@@ -32,17 +35,21 @@ const escape = v => String(v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;',
 let view = 'overview';
 let selectedAccounts=new Set([data.accountId]);
 let previousSelection=null;
-const tabs = { overview: 'Gesamtüberblick', sales: 'Verkauf & Traffic', refunds: 'Erstattungen', ads: 'Werbung', catalog: 'Produktstamm', profit: 'Profit & Kosten', sources: 'Datenquellen & APIs' };
+let trendMetric='revenue',productSort='revenue',lastAnalysis=null;
+const viewsKey='mp-bi-saved-views-v1';
+let savedViews=[];
+try{const saved=JSON.parse(localStorage.getItem(viewsKey)??'[]');if(Array.isArray(saved))savedViews=saved.filter(v=>{try{validateView(v.state,data);return typeof v.name==='string'&&typeof v.id==='string';}catch{return false;}}).slice(0,20);}catch{/* Optional browser storage; default view remains available. */}
+const tabs = { overview: 'Gesamtüberblick', products: 'Produktanalyse', sales: 'Verkauf & Traffic', refunds: 'Erstattungen', ads: 'Werbung', catalog: 'Produktstamm', profit: 'Profit & Kosten', quality: 'Datenqualität', sources: 'Datenquellen & APIs' };
 const metric = (name, value, note, id, primary = false) => `<article class="metric ${primary ? 'primary' : ''}"><p>${name}</p><strong ${id ? `data-testid="${id}"` : ''}>${value}</strong><small>${note}</small></article>`;
 const sumAds = rows => rows.some(r=>r.spend_cents==null)?null:rows.reduce((n, r) => n + r.spend_cents, 0);
 const rating = row => row.rating?.rating == null ? '<span class="muted">Nicht verfügbar</span>' : `<span class="stars">★</span> ${number(row.rating.rating)} <small>(${number(row.rating.rating_count)})</small><small class="subline">Stand ${escape(row.rating.date)}</small>`;
 
 document.querySelector('#app').innerHTML = `
-  <aside><a class="brand" href="./"><span class="logo">mp</span> Marketplace</a><p class="nav-label">VERKAUFSKANAL</p><a class="active" href="#overview" aria-current="page"><span class="amazon-icon">a</span> <span id="active-channel">Amazon DE</span></a><div class="aside-note">Drei Marken.<br>Ein Überblick.<small>Clouvou · Lutivo · Wintoncove</small></div></aside>
+  <aside><a class="brand" href="./"><span class="logo">mp</span> Marketplace BI</a><p class="nav-label">VERKAUFSKANAL</p><a class="active" href="#overview" aria-current="page"><span class="amazon-icon">a</span> <span id="active-channel">Amazon DE</span></a><div class="aside-note">Know your numbers.<br>Grow with clarity.<small>Clouvou · Lutivo · Wintoncove</small></div></aside>
   <main id="overview">
-    <header><span>WORKSPACE / MARKETPLACE BI</span><span class="demo">● Demo-Modus</span></header>
-    <section class="heading"><div><p class="eyebrow"><span id="channel-heading">AMAZON · DEUTSCHLAND</span></p><h1>Deine Listings im Überblick.</h1><p>Clouvou, Lutivo & Wintoncove. Euer Sortiment über Amazon, eBay, OTTO und Kaufland.</p></div></section>
-    <div class="notice"><strong>Beispieldaten · September 2026.</strong> Marken und Modelle stammen aus eurem Katalog. Kennzahlen, Bewertungen und alle mit DEMO gekennzeichneten IDs sind erfunden. Keine Live-Anbindung; echte Listing-IDs und SKUs bleiben offen. Originalwährungen bleiben erhalten; die EUR-Anzeige verwendet ausdrücklich simulierte Tageskurse.</div>
+    <header><span>CLOUVOU GROUP <span class="header-divider">/</span> MARKETPLACE INTELLIGENCE</span><span class="demo">● Demo-Modus</span></header>
+    <section class="heading"><div><p class="eyebrow"><span id="channel-heading">AMAZON · DEUTSCHLAND</span></p><h1>Dein Business. Bis ins Detail.</h1><p>Clouvou, Lutivo & Wintoncove. Von der Gesamtentwicklung bis zum einzelnen Produkt. Vergleichen, verstehen, entscheiden.</p></div></section>
+    <div class="notice"><strong>Beispieldaten · August & September 2026.</strong> Marken und Modelle stammen aus eurem Katalog. Kennzahlen, Bewertungen und alle mit DEMO gekennzeichneten IDs sind erfunden. Keine Live-Anbindung; echte Listing-IDs und SKUs bleiben offen. Originalwährungen bleiben erhalten; die EUR-Anzeige verwendet ausdrücklich simulierte Tageskurse.</div>
     <section class="brand-overview" aria-label="Markenübersicht">${data.catalog.brands.map(b => {
       const count = data.catalog.models.filter(m => m.brand_id === b.id).length;
       return `<article><span class="brand-wordmark">${escape(b.name)}</span><small>${count ? `${count} benannte Modelle` : '5 Bürostuhlmodelle · Namen folgen'}</small></article>`;
@@ -54,13 +61,15 @@ document.querySelector('#app').innerHTML = `
     <section class="filters" aria-label="Filter">
 
       <label>Anzeigewährung<select id="display-currency" aria-label="Anzeigewährung"><option value="eur">Euro (EUR)</option><option value="original">Originalwährung</option></select></label>
-      <label>Zeitraum<select id="period" aria-label="Zeitraum"><option value="30">01.–30. September 2026</option><option value="7">24.–30. September 2026</option></select></label>
+      <label>Zeitraum<select id="period" aria-label="Zeitraum"><option value="30">01.–30. September 2026</option><option value="7">24.–30. September 2026</option><option value="14">17.–30. September 2026</option><option value="custom">Eigener Zeitraum</option></select></label><label class="custom-range" hidden>Von<input id="range-start" type="date" aria-label="Zeitraum von" min="2026-08-01" max="2026-09-30" value="2026-09-01"></label><label class="custom-range" hidden>Bis<input id="range-end" type="date" aria-label="Zeitraum bis" min="2026-08-01" max="2026-09-30" value="2026-09-30"></label><label>Vergleich<select id="compare" aria-label="Periodenvergleich"><option value="previous">Gleich lange Vorperiode</option><option value="off">Ohne Vergleich</option></select></label>
       <label>Marke<select id="brand" aria-label="Marke"><option value="all">Alle Marken</option>${data.catalog.brands.map(b => `<option value="${escape(b.id)}">${escape(b.name)}</option>`).join('')}</select></label>
       <label>Kategorie<select id="category" aria-label="Kategorie"><option value="all">Alle Kategorien</option>${data.catalog.categories.map(c => `<option value="${escape(c.id)}">${escape(c.name)}</option>`).join('')}</select></label>
       <label>Modell<select id="product" aria-label="Modell"></select></label>
       <label class="search-label">Listing suchen<input id="search" type="search" placeholder="ASIN, SKU oder Produktname" aria-label="Listing suchen"></label>
       <button id="reset">Zurücksetzen</button>
     </section>
+    <section class="report-toolbar" aria-label="Reports verwalten"><div><label>Ansicht benennen<input id="view-name" aria-label="Ansicht benennen" maxlength="50" placeholder="z. B. Amazon Wochenreport"></label><button id="save-view">Ansicht speichern</button></div><div><label>Gespeicherte Ansichten<select id="saved-view" aria-label="Gespeicherte Ansichten"><option value="">Ansicht wählen</option></select></label><button id="load-view">Laden</button><button id="delete-view">Löschen</button></div><div><button id="export-products">Produktreport CSV</button><button id="print-report">Drucken / PDF</button></div></section>
+    <p id="report-status" role="status" class="report-status"></p><p id="report-meta" class="print-meta"></p>
     <p class="fx-note">EUR-Umrechnung mit synthetischen Demo-Tageskursen. Keine echten Marktkurse. Originalbeträge per Hover oder unter „Originalbeträge & Wechselkurse“.</p>
     <p id="coverage" class="coverage" aria-live="polite"></p>
     <div id="summary" aria-live="polite"></div>
@@ -100,6 +109,7 @@ function render() {
   document.querySelectorAll('[data-view]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.view===view)));
   if(!accounts.length){
     document.querySelector('#active-channel').textContent='Keine Auswahl';document.querySelector('#channel-heading').textContent='Keine Kanäle ausgewählt';
+    lastAnalysis=null;document.querySelector('#export-products').disabled=true;document.querySelector('#report-meta').textContent='Keine Kanalauswahl';
     document.querySelector('#coverage').textContent='';document.querySelector('#summary').innerHTML='';
     document.querySelector('#content').innerHTML='<section class="empty" role="status"><h2>Wähle mindestens einen Marktplatz</h2><p>Die Kacheln lassen sich einzeln oder gemeinsam auswählen. Ohne Auswahl werden keine Gesamtwerte berechnet.</p></section>';return;
   }
@@ -109,7 +119,11 @@ function render() {
   const isEbay=activeAccount.marketplace==='ebay';
   const trafficLabel=activeAccount.marketplace==='mixed'?'Traffic je Kanal':isAmazon?'Sessions':'Pageviews';
   const conversionLabel=activeAccount.marketplace==='mixed'?'Conversion je Kanal':isAmazon?'Conversion Rate':isEbay?'Transaktionen / Views':'Conversion nicht verfügbar';
-  const start = document.querySelector('#period').value === '7' ? '2026-09-24' : data.start;
+  const preset=document.querySelector('#period').value;
+  document.querySelectorAll('.custom-range').forEach(label=>label.hidden=preset!=='custom');
+  const end=preset==='custom'?document.querySelector('#range-end').value:data.end;
+  const start=preset==='custom'?document.querySelector('#range-start').value:preset==='7'?'2026-09-24':preset==='14'?'2026-09-17':data.start;
+  try{datesBetween(start,end);if(start<data.historyStart||end>data.end)throw new Error('Bitte einen Zeitraum innerhalb der Demo-Historie wählen.');}catch(error){lastAnalysis=null;document.querySelector('#export-products').disabled=true;document.querySelector('#summary').innerHTML='';document.querySelector('#coverage').textContent='';document.querySelector('#report-meta').textContent='Kein gültiger Berichtszeitraum';document.querySelector('#content').innerHTML=`<div class="empty" role="status">${escape(error.message)}</div>`;return;}
   const productId = document.querySelector('#product').value;
   const query = document.querySelector('#search').value;
   const brandId = document.querySelector('#brand').value;
@@ -117,8 +131,11 @@ function render() {
   const selection = { brandId, categoryId, productId, query };
   const catalog = selectCatalog(data, selection);
   const appliedSelection=view==='overview'?{}:selection;
-  const report = analytics(eur?eurData:data, { start, end: data.end, accountId, accountIds, ...appliedSelection });
-  const nativeReports=accounts.map(a=>analytics(data,{start,end:data.end,accountId:a.id,...appliedSelection}));
+  const bi=analyze(data,eur?eurData:data,{start,end,accountIds,eur,...appliedSelection,costs:costState.records,compare:document.querySelector('#compare').value==='previous'});
+  lastAnalysis=bi;const report=bi.report;
+  document.querySelector('#export-products').disabled=!bi.products.length;
+  document.querySelector('#report-meta').textContent=`Synthetischer Demo-Report · ${start} bis ${end} · ${accounts.map(a=>a.name.replace(' · Demo','')).join(', ')} · ${activeAccount.currency} · ${eur?'Demo-Tageskurse':'Originalwährung'} · Produktfilter: ${view==='overview'?'gesamte Konten':[brandId,categoryId,productId,query].join(' / ')}`;
+  const nativeReports=accounts.map(a=>analytics(data,{start,end,accountId:a.id,...appliedSelection}));
   const originals=field=>nativeReports.map(r=>`${r.account.name.replace(' · Demo','')}: ${formatMoney(r.metrics[field],r.account.currency)}`).join(' · ');
   const nativeRows=new Map(nativeReports.flatMap(r=>r.rows.map(l=>[l.id,{...l,currency:r.account.currency}])));
   const originalRevenue=l=>formatMoney(nativeRows.get(l.id).metrics.revenue_cents,nativeRows.get(l.id).currency);
@@ -129,19 +146,21 @@ function render() {
     ${metric('Sales', number(m.units), 'Verkaufte Einheiten', 'units')}
     ${metric(trafficLabel, number(isAmazon?m.sessions:m.page_views), isAmazon?'Summe der Listing-Sessions':'Kein Ersatz für Amazon-Sessions', 'sessions')}
     ${metric(conversionLabel, percent(isAmazon?m.conversion:m.transactionViewRate), isAmazon?'Einheiten ÷ Sessions':isEbay?'Transaktionen ÷ Pageviews':'Keine bestätigte Traffic-Quelle', 'conversion')}
-  </section><details class="originals"><summary>Originalbeträge & Wechselkurse</summary><p>Bestellumsatz: ${escape(originals('revenue_cents'))}</p><p>Erstattungen: ${escape(originals('refund_cents'))}</p><p>Jeder Tagesbetrag wird mit seinem Tageskurs in EUR umgerechnet. Beispielkurse am ${data.end}: ${data.fx.filter(r=>r.date===data.end&&accounts.some(a=>a.currency===r.currency)).map(r=>`1 ${r.currency} = ${r.rate} EUR`).join(' · ')||'EUR unverändert'}. Quelle: synthetische Demodaten.</p></details>`;
+  </section><details class="originals"><summary>Originalbeträge & Wechselkurse</summary><p>Bestellumsatz: ${escape(originals('revenue_cents'))}</p><p>Erstattungen: ${escape(originals('refund_cents'))}</p><p>Jeder Tagesbetrag wird mit seinem Tageskurs in EUR umgerechnet. Beispielkurse am ${end}: ${data.fx.filter(r=>r.date===end&&accounts.some(a=>a.currency===r.currency)).map(r=>`1 ${r.currency} = ${r.rate} EUR`).join(' · ')||'EUR unverändert'}. Quelle: synthetische Demodaten.</p></details>`;
   document.querySelectorAll('[data-view]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.view === view)));
   let html = '';
   const head = (title, note) => `<div class="panel-heading"><h2>${title}</h2><span>${note}</span></div>`;
-  if(view==='overview'){ html=overviewView(blendedReport(data,{accountIds,start,end:data.end,eur}),{productFiltered:brandId!=='all'||categoryId!=='all'||productId!=='all'||!!query.trim()});
-  } else if (view === 'profit') { html=profitView({data,rows:report.rows,accountIds,start,end:data.end,eur,costState});
+  if(view==='overview'){ html=comparisonView(bi,activeAccount.currency)+trendView(bi,activeAccount.currency,trendMetric)+insightsView(bi)+overviewView(bi.marketing,{productFiltered:brandId!=='all'||categoryId!=='all'||productId!=='all'||!!query.trim()});
+  } else if(view==='products'){html=comparisonView(bi,activeAccount.currency)+productsView(bi,activeAccount.currency,productSort)+bridgeView(bi,activeAccount.currency);
+  } else if(view==='quality'){html=qualityView(bi,data);
+  } else if (view === 'profit') { html=profitView({data,rows:report.rows,accountIds,start,end,eur,costState});
   } else if (view === 'sources') { html = accounts.map(a=>sourcesView(a,integrationData.results)).join('');
   } else if (view === 'sales') {
     html = `<section class="panel">${head('Listing-Performance', `${report.rows.length} Demo-Listings · Bewertungen nur mit geeigneter Quelle`)}${table(['Listing / externe ID', 'Bewertung', trafficLabel, conversionLabel, 'Sales · Einheiten', 'Umsatz'], report.rows.map(r => `<tr data-testid="listing-row"><td>${listingCell(r)}</td><td>${rating(r)}</td><td>${number(data.accounts.find(a=>a.id===r.account_id).marketplace==='amazon'?r.metrics.sessions:r.metrics.page_views)}</td><td>${percent(data.accounts.find(a=>a.id===r.account_id).marketplace==='amazon'?r.metrics.conversion:r.metrics.transactionViewRate)}</td><td>${number(r.metrics.units)}</td><td class="amount">${money(r.metrics.revenue_cents,originalRevenue(r))}<small class="subline">Ø Preis ${money(r.metrics.units?r.metrics.revenue_cents/r.metrics.units:null,formatMoney(nativeRows.get(r.id).metrics.units?nativeRows.get(r.id).metrics.revenue_cents/nativeRows.get(r.id).metrics.units:null,nativeRows.get(r.id).currency))}</small><details><summary>Originalbetrag</summary>${escape(originalRevenue(r))} · ${escape(nativeRows.get(r.id).currency)}</details></td></tr>`), 'Listing-Performance')}</section>`;
   } else if (view === 'refunds') {
     html = `<section class="metrics secondary">${metric('Erstattungsbetrag', money(m.refund_cents), 'Im gewählten Zeitraum', 'refund-amount')}${metric('Erstattete Einheiten', number(m.refunded_units), 'Nach Erstattungsdatum')}${metric('Erstattungsrate', percent(m.refundRate), 'Periodenquote, keine Bestellkohorte')}</section><section class="panel">${head('Erstattungen nach Listing', 'Erstattungsdatum · ohne Kohortenzuordnung')}${table(['Listing / ASIN', 'Sales · Einheiten', 'Erstattete Einheiten', 'Erstattungsbetrag', 'Erstattungsrate'], report.rows.map(r => `<tr><td>${listingCell(r)}</td><td>${number(r.metrics.units)}</td><td>${number(r.metrics.refunded_units)}</td><td>${money(r.metrics.refund_cents)}</td><td>${percent(r.metrics.refundRate)}</td></tr>`), 'Erstattungen')}</section>`;
   } else if (view === 'ads') {
-    const blended=blendedReport(data,{accountIds,start,end:data.end,eur});
+    const blended=blendedReport(data,{accountIds,start,end,eur});
     report.accountSpend=blended.spend==null?null:Number(blended.spend)*100;
     html = `${blended.spend==null?'<div class="notice">Werbedaten der Kanalauswahl sind unvollständig. Zugeordnete Kosten und Werbetypen zeigen nur vorliegende Werte; die Kontogesamtsumme bleibt offen.</div>':''}<section class="metrics secondary">${metric('Listing-zugeordnete Kosten', money(report.assignedSpend), 'Für die gefilterten Listings', 'assigned-spend')}${metric('Nicht zuordenbare Kosten', money(report.unassignedSpend), 'Gesamtes Konto · nur Zeitraumfilter', 'unassigned-spend')}${metric('Werbeausgaben · Konto gesamt', money(report.accountSpend), 'Alle Listings + nicht zuordenbar', 'account-spend')}</section>
       <section class="panel">${head('Werbeausgaben nach Werbetyp', 'Keine pauschale Verteilung auf Produkte')}${table(['Werbetyp', 'ASIN-zugeordnet · Auswahl', 'Nicht zuordenbar · Konto'], report.adBreakdown.map(a => `<tr><td>${a.name}</td><td>${money(a.assigned)}</td><td>${money(a.unassigned)}</td></tr>`), 'Werbetypen')}<p class="table-note">Streaming TV wird in dieser Demo nur auf Kontoebene berichtet. „—“ bedeutet: kein zugehöriger Datensatz vorhanden.</p></section>
@@ -157,10 +176,11 @@ function render() {
     }), 'Produktstamm')}</section>`;
     if (catalog.groups.length) html += `<section class="panel">${head('Noch zu ergänzen', 'Keine erfundenen Artikel oder Varianten')}<div class="pending-grid">${catalog.groups.map(g => `<article><p class="eyebrow">${escape(data.catalog.brands.find(b => b.id === g.brand_id).name)}</p><h3>${escape(data.catalog.categories.find(c => c.id === g.category_id).name)}</h3><p>${g.confirmed_model_count ? `${g.confirmed_model_count} Modelle · Namen und Varianten folgen.` : g.category_id === 'gaming-chairs' ? 'Geplante Erweiterung · Modelle und Varianten folgen.' : 'Konkrete Artikel folgen. Beispiele: Mauspad, Stehmatte, Sitzkissen, Fußstütze.'}</p></article>`).join('')}</div></section>`;
   }
-  if (!report.rows.length && view !== 'catalog' && view !== 'sources') html = `<div class="empty" role="status"><h2>Keine Demo-Listings in dieser Auswahl</h2><p>${catalog.models.length || catalog.groups.length ? 'Das Sortiment ist vorgemerkt. Varianten und echte Marketplace-Zuordnungen sind noch offen; deshalb werden hier keine Kennzahlen erfunden.' : 'Suche oder Filter anpassen. Fehlende Daten sind keine Nullverkäufe.'}</p><button id="open-catalog">Produktstamm ansehen</button></div>` + (view === 'ads' ? html : '');
+  if (!report.rows.length && !['catalog','sources','quality'].includes(view)) html = `<div class="empty" role="status"><h2>Keine Demo-Listings in dieser Auswahl</h2><p>${catalog.models.length || catalog.groups.length ? 'Das Sortiment ist vorgemerkt. Varianten und echte Marketplace-Zuordnungen sind noch offen; deshalb werden hier keine Kennzahlen erfunden.' : 'Suche oder Filter anpassen. Fehlende Daten sind keine Nullverkäufe.'}</p><button id="open-catalog">Produktstamm ansehen</button></div>` + (view === 'ads' ? html : '');
   if (view === 'catalog' && !catalog.models.length && !catalog.groups.length) html = '<div class="empty" role="status"><h2>Keine Modelle gefunden</h2><p>Suche oder Filter anpassen.</p></div>';
   document.querySelector('#content').innerHTML = html;
   document.querySelectorAll('[data-drill-channel]').forEach(button=>button.addEventListener('click',()=>{previousSelection=[...selectedAccounts];selectedAccounts=new Set([button.dataset.drillChannel]);view='sales';render();}));
+  bindIntelligence(bi,activeAccount.currency,{trendMetric,onTrend:value=>{trendMetric=value;render();},onSort:value=>{productSort=value;render();},onProduct:id=>showProduct(bi.products.find(p=>p.id===id)),onJump:id=>{view=id;render();}});
   if(view==='profit')bindProfit({data,rows:report.rows,costState,render});
   document.querySelector('#open-catalog')?.addEventListener('click', () => { view = 'catalog'; render(); });
   document.querySelectorAll('[data-listing]').forEach(b => b.addEventListener('click', () => {
@@ -187,10 +207,11 @@ function updateModels() {
   if (models.some(m => m.id === current)) document.querySelector('#product').value = current;
 }
 for (const id of ['brand', 'category']) document.querySelector(`#${id}`).addEventListener('change', () => { updateModels(); render(); });
-for (const id of ['period', 'product','display-currency']) document.querySelector(`#${id}`).addEventListener('change', render);
+for (const id of ['period', 'product','display-currency','compare','range-start','range-end']) document.querySelector(`#${id}`).addEventListener('change', render);
 document.querySelector('#search').addEventListener('input', render);
 document.querySelector('#reset').addEventListener('click', () => {
   document.querySelector('#period').value = '30';
+  document.querySelector('#compare').value = 'previous';
   document.querySelector('#brand').value = 'all';
   document.querySelector('#category').value = 'all';
   updateModels();
@@ -203,5 +224,20 @@ document.querySelector('#select-all-channels').addEventListener('click',()=>{pre
 document.querySelector('#select-amazon-channels').addEventListener('click',()=>{previousSelection=null;selectedAccounts=new Set(data.accounts.filter(a=>a.marketplace==='amazon').map(a=>a.id));render();});
 document.querySelector('#clear-channels').addEventListener('click',()=>{previousSelection=null;selectedAccounts.clear();render();});
 document.querySelector('#back-channels').addEventListener('click',()=>{selectedAccounts=new Set(previousSelection??[]);previousSelection=null;view='overview';render();});
+refreshSavedViews();
 updateModels();
 render();
+
+function showProduct(product){
+ if(!product)return;const dialog=document.querySelector('#listing-dialog');document.querySelector('#detail-content').innerHTML=productDetail(product,activeAccount.currency,data);
+ document.querySelector('#close-detail').addEventListener('click',()=>dialog.close());
+ document.querySelector('#product-to-listings').addEventListener('click',()=>{dialog.close();document.querySelector('#brand').value='all';document.querySelector('#category').value='all';document.querySelector('#search').value='';updateModels();document.querySelector('#product').value=product.id;view='sales';render();});dialog.showModal();
+}
+function refreshSavedViews(){document.querySelector('#saved-view').innerHTML='<option value="">Ansicht wählen</option>'+savedViews.map(v=>`<option value="${escape(v.id)}">${escape(v.name)}</option>`).join('');}
+function reportStatus(text){document.querySelector('#report-status').textContent=text;}
+function captureView(){if(!lastAnalysis)throw new Error('Zuerst Kanäle und einen gültigen Zeitraum auswählen.');return validateView({version:1,accountIds:[...selectedAccounts],start:lastAnalysis.options.start,end:lastAnalysis.options.end,view,currency:document.querySelector('#display-currency').value,brandId:document.querySelector('#brand').value,categoryId:document.querySelector('#category').value,productId:document.querySelector('#product').value,query:document.querySelector('#search').value,compare:document.querySelector('#compare').value==='previous'},data);}
+document.querySelector('#save-view').addEventListener('click',()=>{try{const name=document.querySelector('#view-name').value.trim();if(!name)throw new Error('Bitte einen Namen für die Ansicht eingeben.');if(savedViews.length>=20)throw new Error('Maximal 20 Ansichten. Bitte eine alte Ansicht löschen.');const next=[...savedViews,{id:crypto.randomUUID(),name,state:captureView()}];localStorage.setItem(viewsKey,JSON.stringify(next));savedViews=next;refreshSavedViews();document.querySelector('#saved-view').value=next.at(-1).id;reportStatus('Ansicht lokal gespeichert. Keine Synchronisation zwischen Geräten.');}catch(error){reportStatus(error.message);}});
+document.querySelector('#load-view').addEventListener('click',()=>{try{const saved=savedViews.find(v=>v.id===document.querySelector('#saved-view').value);if(!saved)throw new Error('Bitte eine gespeicherte Ansicht wählen.');const state=validateView(saved.state,data);selectedAccounts=new Set(state.accountIds);previousSelection=null;view=state.view;document.querySelector('#period').value='custom';document.querySelector('#range-start').value=state.start;document.querySelector('#range-end').value=state.end;document.querySelector('#compare').value=state.compare?'previous':'off';document.querySelector('#display-currency').value=state.currency;document.querySelector('#brand').value=state.brandId;document.querySelector('#category').value=state.categoryId;updateModels();document.querySelector('#product').value=state.productId;document.querySelector('#search').value=state.query;render();reportStatus(`Ansicht „${saved.name}“ geladen.`);}catch(error){reportStatus(error.message);}});
+document.querySelector('#delete-view').addEventListener('click',()=>{try{const id=document.querySelector('#saved-view').value;if(!savedViews.some(v=>v.id===id))throw new Error('Bitte eine gespeicherte Ansicht wählen.');const next=savedViews.filter(v=>v.id!==id);localStorage.setItem(viewsKey,JSON.stringify(next));savedViews=next;refreshSavedViews();reportStatus('Gespeicherte Ansicht gelöscht.');}catch(error){reportStatus(error.message);}});
+document.querySelector('#export-products').addEventListener('click',()=>{if(!lastAnalysis)return;const url=URL.createObjectURL(new Blob([productCsv(lastAnalysis,activeAccount.currency)],{type:'text/csv;charset=utf-8'}));const link=document.createElement('a');link.href=url;link.download=`MP-Demo-Produkte-${lastAnalysis.options.start}-${lastAnalysis.options.end}.csv`;link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);reportStatus('Produktreport exportiert: aktuelle Auswertung, Zeitraum, Währung und Demo-Herkunft enthalten.');});
+document.querySelector('#print-report').addEventListener('click',()=>window.print());

@@ -5,7 +5,7 @@ test('Amazon overview, product and SKU filters, details and empty state', async 
   const errors = [];
   page.on('pageerror', e => errors.push(e.message));
   await page.goto('/');await page.getByRole('button',{name:'Verkauf & Traffic',exact:true}).click();
-  await expect(page.getByRole('heading', { name: 'Deine Listings im Überblick.' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Dein Business. Bis ins Detail.' })).toBeVisible();
   await expect(page.getByText('Demo-Modus')).toBeVisible();
   await expect(page.getByTestId('units')).toHaveText('4.230');
   await expect(page.getByTestId('listing-row')).toHaveCount(18);
@@ -15,7 +15,7 @@ test('Amazon overview, product and SKU filters, details and empty state', async 
   await page.getByLabel('Listing suchen').fill('DEMO-SKU-001-FBM');
   await expect(page.getByTestId('listing-row')).toHaveCount(1);
   await expect(page.getByTestId('units')).toHaveText('180');
-  await page.getByLabel('Zeitraum').selectOption('7');
+  await page.getByLabel('Zeitraum', {exact:true}).selectOption('7');
   await expect(page.getByTestId('units')).toHaveText('42');
   await page.getByRole('button', { name: 'Clouvou Bright Seat · Schwarz', exact: true }).click();
   await expect(page.getByRole('dialog')).toBeVisible();
@@ -41,7 +41,7 @@ test('ad overhead stays separate from filtered listing spend; refunds and produc
   await expect(page.getByTestId('unassigned-spend')).toHaveText(/615,00\s*€/);
   await expect(page.getByTestId('account-spend')).toHaveText(account);
   await expect(page.getByTestId('assigned-spend')).not.toHaveText(assigned);
-  await page.getByLabel('Zeitraum').selectOption('7');
+  await page.getByLabel('Zeitraum', {exact:true}).selectOption('7');
   await expect(page.getByTestId('unassigned-spend')).toHaveText(/143,50\s*€/);
   await page.getByRole('button', { name: 'Erstattungen', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Erstattungen nach Listing' })).toBeVisible();
@@ -55,7 +55,7 @@ test('all mobile sections fit the viewport and missing ratings are explicit', as
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');await page.getByRole('button',{name:'Verkauf & Traffic',exact:true}).click();
   await expect(page.getByText('Nicht verfügbar', { exact: true }).first()).toBeVisible();
-  for (const name of ['Gesamtüberblick', 'Verkauf & Traffic', 'Erstattungen', 'Werbung', 'Produktstamm', 'Profit & Kosten', 'Datenquellen & APIs']) {
+  for (const name of ['Gesamtüberblick', 'Produktanalyse', 'Datenqualität', 'Verkauf & Traffic', 'Erstattungen', 'Werbung', 'Produktstamm', 'Profit & Kosten', 'Datenquellen & APIs']) {
     await page.getByRole('button', { name, exact: true }).click();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   }
@@ -119,7 +119,7 @@ test('profit costs persist locally, keep history and block missing purchase cost
  await page.getByLabel('Kosten Einkauf',{exact:true}).fill('90');
  await page.getByRole('button',{name:'Kostenversion speichern',exact:true}).click();
  await expect(page.getByTestId('profit-value')).not.toHaveText(before);
- await expect(page.getByRole('status')).toContainText('Kostenversion gespeichert');
+ await expect(page.locator('#cost-message')).toContainText('Kostenversion gespeichert');
  const changed=await page.getByTestId('profit-value').innerText();await page.reload();
  await page.getByRole('button',{name:'Profit & Kosten',exact:true}).click();await expect(page.getByTestId('profit-value')).toHaveText(changed);
  await page.getByLabel('Kosten gültig ab').fill('2026-09-20');await page.getByLabel('Kosten Einkauf',{exact:true}).fill('');
@@ -147,7 +147,7 @@ test('free tile combinations force EUR only for mixed currencies and handle an e
  await page.getByRole('checkbox',{name:'Amazon Frankreich',exact:true}).check();await expect(page.getByTestId('channel-comparison')).toHaveCount(3);
  await expect(page.getByTestId('blended-roas')).not.toHaveText('—');await expect(page.getByTestId('blended-acos')).not.toHaveText('—');
  await page.getByRole('checkbox',{name:'eBay Deutschland',exact:true}).check();await expect(page.getByTestId('blended-spend')).toHaveText('—');await expect(page.getByTestId('blended-tacos')).toHaveText('—');
- await expect(page.getByRole('status')).toContainText('3 / 4');
+ await expect(page.locator('#content [role=status]')).toContainText('3 / 4');
  await page.getByRole('button',{name:'Auswahl leeren',exact:true}).click();await expect(page.getByRole('heading',{name:'Wähle mindestens einen Marktplatz'})).toBeVisible();
  const de=page.getByRole('checkbox',{name:'Amazon Deutschland',exact:true});await de.focus();await page.keyboard.press('Space');await expect(de).toBeChecked();await expect(page.getByTestId('blended-roas')).not.toHaveText('—');expect(errors).toEqual([]);
 });

@@ -6,13 +6,15 @@ Dashboard für neun Amazon-Länder sowie eBay, OTTO und Kaufland auf Listing-Ebe
 
 ## Funktionsumfang
 
+- **BI-Arbeitsbereich:** frei wählbare Zeiträume, gleich lange Vorperioden, Tagestrends, kanalübergreifende Produktanalyse, regelbasierte Hinweise und Datenqualität. Lokal gespeicherte Ansichten, CSV-Reports und Druck-/PDF-Ansicht. [Bedienung und Rechenregeln](docs/BI_WORKSPACE.md).
+
 - **Verkauf & Traffic:** Bestellumsatz, verkaufte Einheiten (Sales), Sessions, Conversion Rate und letzter Bewertungsstand inklusive Anzahl und Datum je ASIN.
 - **Erstattungen:** Betrag, erstattete Einheiten und Periodenquote je ASIN.
 - **Werbung:** Sponsored Products, Sponsored Brands, Sponsored Display, Streaming TV und sonstige Werbeformen. Eindeutig ASIN-zugeordnete Kosten sind getrennt von nicht zuordenbaren Kosten auf Kontoebene.
 - **Produktstamm:** interne Produkte → ASINs → Seller-SKUs. Mehrere SKUs einer ASIN verdoppeln keine Kennzahlen. Ein Produkt kann mehrere ASINs bündeln.
 - Zeitraum-, Produkt- und ASIN/SKU-Suchfilter, Listing-Details sowie mobile Darstellung.
 
-Marken und Modellnamen stammen aus dem bestätigten Sortiment **Clouvou, Lutivo und Wintoncove**. Der Produktstamm zeigt 15 benannte Modelle und offene Sortimentsgruppen. Für die 18 bestätigten Clouvou-Bürostuhl-Farbvarianten werden **synthetische Kennzahlen für September 2026** erzeugt; sämtliche Demo-Listing-/SKU-IDs sind ausdrücklich mit `DEMO-` gekennzeichnet. Echte ASINs/SKUs und unbekannte Varianten bleiben offen. Zwölf serverseitige Importstrecken mit OAuth-/HMAC-Authentifizierung, Report-Jobs, Normalisierung und SQLite-Upserts sind vorbereitet und mit synthetischen API-Antworten getestet. Echte Konten sind noch nicht verbunden; Login und Datenpflege im Browser fehlen weiterhin. Siehe [API-Recherche und Dateninventar](docs/api/README.md) sowie [Importbetrieb](backend/README.md). Es gibt keine Auswertung anderer gekaufter SKUs und keine künstlich abgeleiteten organischen Sales.
+Marken und Modellnamen stammen aus dem bestätigten Sortiment **Clouvou, Lutivo und Wintoncove**. Der Produktstamm zeigt 15 benannte Modelle und offene Sortimentsgruppen. Für die 18 bestätigten Clouvou-Bürostuhl-Farbvarianten werden **synthetische Kennzahlen für August und September 2026** erzeugt; sämtliche Demo-Listing-/SKU-IDs sind ausdrücklich mit `DEMO-` gekennzeichnet. Echte ASINs/SKUs und unbekannte Varianten bleiben offen. Zwölf serverseitige Importstrecken mit OAuth-/HMAC-Authentifizierung, Report-Jobs, Normalisierung und SQLite-Upserts sind vorbereitet und mit synthetischen API-Antworten getestet. Echte Konten sind noch nicht verbunden; Login und eine serverseitige Produkt-/Datenpflege im Browser fehlen weiterhin. Siehe [API-Recherche und Dateninventar](docs/api/README.md) sowie [Importbetrieb](backend/README.md). Es gibt keine Auswertung anderer gekaufter SKUs und keine künstlich abgeleiteten organischen Sales.
 
 Neun getrennte Amazon-Kanäle: DE, FR, IT, ES, NL, BE, PL, GB und US. eBay/Kaufland zunächst Deutschland. 216 synthetische Listings, EUR/GBP/PLN/USD ohne Währungsmischung; eBay-Pageviews bleiben getrennt von Amazon-Sessions. OTTO-/Kaufland-Traffic und nicht belegte Werbung werden als unbekannt dargestellt. Der Reiter **Datenquellen & APIs** zeigt Importstatus, Quellfelder und Grenzen.
 

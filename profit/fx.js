@@ -10,7 +10,7 @@ export function toEuro(value,currency,date,rates) {
  return decimal((n+half)/1000000n);
 }
 export function euroDemo(data) {
- return Array.from({length:30},(_,i)=>Object.entries({GBP:1.17,USD:.90,PLN:.23}).map(([currency,base])=>({date:`2026-09-${String(i+1).padStart(2,'0')}`,currency,target:'EUR',rate:(base+(i%5-2)*.0001).toFixed(6),source:'synthetic-demo',label:'Erfundener Demo-Tageskurs · keine Marktnotierung'}))).flat();
+ return [...new Set(data.listing_daily.map(r=>r.date))].sort().flatMap(date=>Object.entries({GBP:1.17,USD:.90,PLN:.23}).map(([currency,base])=>({date,currency,target:'EUR',rate:(base+((Number(date.slice(-2))-1)%5-2)*.0001).toFixed(6),source:'synthetic-demo',label:'Erfundener Demo-Tageskurs · keine Marktnotierung'})));
 }
 export function euroData(data) {
  const account=id=>data.accounts.find(a=>a.id===id);

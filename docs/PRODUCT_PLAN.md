@@ -1,6 +1,6 @@
 # Marketplace BI — Produktplan
 
-Stand: 02.10.2026 · Planungsstand, keine Behauptung bereits implementierter Funktionen.
+Stand: 04.10.2026 · Abschnitt 2 beschreibt den implementierten Stand; die übrigen Zielbilder bleiben Planung.
 
 ## 1. Ziel und Leitentscheidung
 
@@ -12,9 +12,9 @@ Sellerboard ist eine funktionale Referenz für Profitabilitäts- und Marketplace
 
 ## 2. Was bereits existiert — und was noch fehlt
 
-Vorhanden: statische Amazon-DE-Demo, 18 synthetische Listings auf bestätigten Clouvou-Stuhlvarianten, 15 benannte Modelle im Produktstamm und Marken-/Kategoriefilter, Produkt-/SKU-Modell, lokale SQLite-Grundlage, Verkauf/Traffic/Erstattungen/Werbekosten, einzelne Produktfilter und Listing-Details, automatisierte Tests und GitHub-Pages-Veröffentlichung.
+Vorhanden: statische Demo für neun Amazon-Länder, eBay, OTTO und Kaufland mit 216 Listings; 15 benannte Modelle im Produktstamm, 18 bestätigte Farbvarianten. Mehrfachfilter, EUR/Originalwährungen, SKU-Kostenpflege und DB, Werbequoten mit Abdeckung, vorbereitete private Importstrecken. Der BI-Ausbau ergänzt August-/September-Historie, eigene Zeiträume mit gleich langer Vorperiode, Tagestrends, Modellanalyse und Listingdrilldown, regelbasierte Hinweise, Datenqualitätsansicht, lokale gespeicherte Ansichten, CSV und Drucklayout. Siehe [BI-Arbeitsbereich](BI_WORKSPACE.md).
 
-Noch nicht vorhanden: echtes Reporting über mehrere Marktplätze, größere Historie, frei wählbare Vergleichszeiträume, Trends, Kostenrechnung, editierbarer Produktstamm, gespeicherte Reports, Importpipeline, Backend-API, Login und echte Marketplace-Verbindungen.
+Noch offen: echte Kontoverbindungen und Quellenabgleich, authentifizierte Backend-API, Login, produktionsfähiger Importbetrieb, editierbarer echter Produktstamm, serverseitige Reports, frei definierbare unabhängige Vergleichszeiträume, Jahresvergleiche mit echter Historie, flexible Gruppierungen und Spaltenwahl. Eine Produktionsmigration ist vorbereitet, aber nicht durch Austausch eines öffentlichen JSON-Snapshots erledigt.
 
 Wiederverwenden: fachliche Zuordnung Produkt → Listing → SKU, bisherige Demo-Kennzahlen, Geldwerte ohne Gleitkomma-Rundungsfehler, Trennung nicht zuordenbarer Werbung, Tests und Veröffentlichungsablauf. Weiterentwickeln: gegenwärtige Ein-Datei-Oberfläche, fest eingebundener JSON-Snapshot und SQLite-Demoexport. Diese sind ein Prototyp, noch nicht die endgültige Architektur.
 

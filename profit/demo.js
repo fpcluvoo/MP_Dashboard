@@ -2,6 +2,8 @@ import {money} from '../integrations/money.js';
 // Explicitly fabricated accounting inputs. No inferred real-world VAT, fee or FX rules.
 export function profitDemo(data) {
  const costs=[],lines=[],advertising=[],overhead=[];
+ const adTotals=new Map();for(const a of data.ad_spend){const key=`${a.account_id}/${a.listing_id??'overhead'}/${a.date}`;adTotals.set(key,(adTotals.get(key)??0)+a.spend_cents);}
+ const dates=[...new Set(data.listing_daily.map(r=>r.date))];
  const amount=cents=>money((cents/100).toFixed(2));
  for(const a of data.accounts){
   const listings=data.listings.filter(l=>l.account_id===a.id),factor=a.currency==='PLN'?4:1;
@@ -15,10 +17,10 @@ export function profitDemo(data) {
    const revenue=Math.round(f.revenue_cents/1.19),refund=Math.round(f.refund_cents/1.19);
    const fee=Math.round((revenue-refund)*({amazon:.15,ebay:.12,otto:.17,kaufland:.13}[a.marketplace]));
    lines.push({id:`DEMO-ORDER-${f.listing_id}-${f.date}/1`,orderId:`DEMO-ORDER-${f.listing_id}-${f.date}`,accountId:a.id,listingId:f.listing_id,sku:s.sku,currency:a.currency,date:f.date,units:f.units,revenueNet:amount(revenue),refundNet:amount(refund),marketplaceFeesNet:amount(fee),fulfillmentNet:a.marketplace==='amazon'&&s.fulfillment==='FBA'?amount(f.units*750*factor):null,feesComplete:true,inventoryCreditNet:'0.000000',source:'synthetic-settlement'});
-   const ads=data.ad_spend.filter(x=>x.listing_id===f.listing_id&&x.date===f.date);
-   advertising.push({accountId:a.id,listingId:f.listing_id,date:f.date,currency:a.currency,netAmount:ads.length?amount(ads.reduce((n,x)=>n+x.spend_cents,0)):null});
+   const ads=adTotals.get(`${a.id}/${f.listing_id}/${f.date}`);
+   advertising.push({accountId:a.id,listingId:f.listing_id,date:f.date,currency:a.currency,netAmount:ads==null?null:amount(ads)});
   }
-  for(let d=1;d<=30;d++){const date=`2026-09-${String(d).padStart(2,'0')}`,ads=data.ad_spend.filter(x=>x.account_id===a.id&&!x.listing_id&&x.date===date);overhead.push({accountId:a.id,date,currency:a.currency,netAmount:ads.length?amount(ads.reduce((n,x)=>n+x.spend_cents,0)):null});}
+  for(const date of dates){const ads=adTotals.get(`${a.id}/overhead/${date}`);overhead.push({accountId:a.id,date,currency:a.currency,netAmount:ads==null?null:amount(ads)});}
  }
  return {costs,lines,advertising,overhead};
 }
